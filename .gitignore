@@ -1,0 +1,26 @@
+# Dependencies and caches
+node_modules/
+*.log
+*.tmp
+.DS_Store
+
+# Env files
+.env
+.env.*
+
+# Frontend build
+frontend/dist/
+frontend/dist-ssr/
+
+# Backend build (if used)
+backend/dist/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
