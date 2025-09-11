@@ -18,10 +18,14 @@ lerna-debug.log*
 frontend/dist/
 frontend/dist-ssr/
 frontend/.vite/
+frontend/coverage/
+backend/coverage/
 
 # Backend build (if used)
 backend/dist/
 backend/build/
+backend/uploads/
+backend/logs/
 
 # Editor
 .vscode/*
@@ -44,6 +48,26 @@ recoil-devtools/
 # Temporary files
 *.tmp
 *.temp
+*.pid
+*.pid.lock
+*.seed
+*.tgz
+
+# Caches
+.eslintcache
+.cache/
+.parcel-cache/
+.turbo/
+
+# Logs
+logs/
+
+# Local runtime files
+.vercel/
+.netlify/
+coverage/
+frontend/.next/
+backend/.cache/
 
 
 

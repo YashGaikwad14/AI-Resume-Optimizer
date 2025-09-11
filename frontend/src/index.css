@@ -5,6 +5,49 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 220 27% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 25% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 25% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 27% 8%;
+
+    --secondary: 220 20% 14%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 220 20% 14%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 16%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(262 83% 58%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 27% 8%) 0%, hsl(220 25% 12%) 50%, hsl(217 91% 8%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(220 25% 10%) 0%, hsl(220 20% 12%) 100%);
+    --gradient-button: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(217 91% 60%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(220 27% 8%) 0%, hsl(220 25% 10%) 100%);
+
+    --glow-primary: 0 0 30px hsl(217 91% 60% / 0.3);
+    --glow-accent: 0 0 25px hsl(262 83% 58% / 0.4);
+    --shadow-card: 0 10px 30px -10px hsl(220 27% 4% / 0.5);
+    --shadow-elegant: 0 20px 40px -15px hsl(217 91% 60% / 0.2);
+  }
+
   * {
     margin: 0;
     padding: 0;
@@ -15,6 +58,7 @@
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    @apply bg-background text-foreground;
   }
 
   ::-webkit-scrollbar {

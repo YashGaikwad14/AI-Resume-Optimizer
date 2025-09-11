@@ -1,7 +1,9 @@
 import { useRecoilState } from "recoil";
 import { marked } from "marked";
-import ResultsContainer from "./components/ResultsContainer";
-import ToolsMenu from "./components/ToolsMenu";
+import ResultsUnified from "./components/ResultsUnified";
+import ToolsSection from "./components/ToolsSection";
+import NewHeader from "./components/NewHeader";
+import HeroSection from "./components/HeroSection";
 import {
   resumeFileState,
   jobDescriptionState,
@@ -193,18 +195,15 @@ function App() {
 
   return (
     <div className="main-container">
-      <div className="card-primary">
-        <header className="app-header">
-          <h1 className="app-title">AI Resume Optimizer</h1>
-          <p className="app-subtitle">Get instant feedback to tailor your resume</p>
-        </header>
-        
-        <div className="grid grid-cols-1 gap-6">
-          <div className="form-section">
-            <h3 className="font-semibold text-slate-800 mb-2">Inputs</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-1">
-                <label className="form-label">Upload Resume (PDF)</label>
+      <div className="max-w-6xl w-full mx-auto px-4">
+        <NewHeader />
+        <HeroSection />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="rounded-2xl border border-border bg-secondary p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Inputs</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-muted-foreground mb-2">Upload Resume (PDF)</label>
                 <label className={`file-drop-zone ${resumeFile ? "file-selected" : ""}`}>
                   <input
                     type="file"
@@ -213,57 +212,65 @@ function App() {
                     style={{ display: "none" }}
                   />
                   {resumeFile ? (
-                    <span>{resumeFile.name}</span>
+                    <span className="text-sm text-muted-foreground">{resumeFile.name}</span>
                   ) : (
-                    <span>Click to choose a PDF</span>
+                    <div className="flex flex-col items-center gap-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-primary"><path d="M12 16a1 1 0 0 1-1-1V8.41l-2.3 2.3a1 1 0 1 1-1.4-1.42l4-4a1 1 0 0 1 1.4 0l4 4a1 1 0 0 1-1.4 1.42L13 8.4V15a1 1 0 0 1-1 1Z"/><path d="M5 20a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3h2a1 1 0 0 1 0 2H5a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1h-2a1 1 0 1 1 0-2h2a3 3 0 0 1 3 3v1a3 3 0 0 1-3 3H5Z"/></svg>
+                      <div className="text-muted-foreground">
+                        <div className="text-sm font-medium">Click to choose a PDF</div>
+                        <div className="text-xs opacity-80">or drag and drop your resume here</div>
+                      </div>
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background/50 text-sm">
+                        Browse Files
+                      </span>
+                    </div>
                   )}
                 </label>
               </div>
-              <div className="md:col-span-2">
-                <label className="form-label">Job Description</label>
-                <textarea
-                  className="form-textarea"
-                  placeholder="Paste the job description here..."
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                />
+              <div>
+                <label className="block text-sm font-semibold text-muted-foreground mb-2">Job Description</label>
+                <div className="rounded-xl border border-border bg-background/50 p-3">
+                  <textarea
+                    id="jd-area"
+                    className="w-full h-48 p-3 bg-transparent outline-none text-foreground placeholder:text-muted-foreground transition-smooth"
+                    placeholder="Paste the complete job description... (requirements, responsibilities, company info)"
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                  />
+                  <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                    <span>Tip: richer JDs yield better analysis.</span>
+                    <span>{jobDescription.length} chars</span>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <h3 className="font-semibold text-slate-800 mt-6 mb-2">Tools</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <button
-                className="btn-primary"
-                onClick={analyzeResume}
-                disabled={loading}
-              >
-                {loading ? "Analyzing..." : "Analyze Resume"}
-              </button>
-              <button
-                className="btn-primary"
-                onClick={scoreResume}
-                disabled={loading}
-              >
-                Score Match
-              </button>
-              <button
-                className="btn-primary"
-                onClick={generateCoverLetter}
-                disabled={loading}
-              >
-                Cover Letter
-              </button>
-            </div>
-            <ToolsMenu onToolClick={handleToolClick} />
-
+          </div>
+          <div className="rounded-2xl border border-border bg-secondary p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Tools</h3>
+            <ToolsSection 
+              onAnalyze={analyzeResume}
+              onScoreMatch={scoreResume}
+              onGenerateCoverLetter={generateCoverLetter}
+              onAdvancedTool={handleToolClick}
+              onAdvancedToggle={(open) => {
+                const area = document.getElementById('jd-area');
+                if (area) {
+                  area.style.height = open ? '20rem' : '12rem';
+                }
+              }}
+              isLoading={loading}
+              canAnalyze={!!resumeFile}
+            />
             {error && (
-              <div className="error-container">{error}</div>
+              <div className="mt-4 error-banner">
+                <div className="text-sm">{error}</div>
+                <button className="text-xs underline text-red-200/80" onClick={() => setError("")}>Dismiss</button>
+              </div>
             )}
           </div>
-
-          <ResultsContainer
-            copyHtmlText={copyHtmlText}
-          />
+        </div>
+        <div className="mt-8">
+          <ResultsUnified />
         </div>
       </div>
     </div>

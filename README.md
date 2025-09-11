@@ -16,8 +16,9 @@ An end-to-end app that analyzes your PDF resume, scores it against a job descrip
 - Clean UI with collapsible sections and deep-link scrolling
 
 ## Tech Stack
-- Frontend: React (Vite), Tailwind CSS v3, Recoil (State Management)
-- Backend: Node.js (Express), `multer` (PDF upload), `pdf-parse` (text extraction)
+- Frontend: React (Vite), Tailwind CSS v3, Recoil (state), React Router
+- Design System: Dark theme with CSS vars (HSL), gradients, glow shadows
+- Backend: Node.js (Express), `multer` (PDF), `pdf-parse` (extraction)
 - AI: Google Gemini (generateContent API)
 
 ## Monorepo Structure
@@ -30,14 +31,13 @@ An end-to-end app that analyzes your PDF resume, scores it against a job descrip
    ├─ src/
    │  ├─ App.jsx, App.css, index.css, main.jsx, About.jsx
    │  ├─ Atoms/
-   │  │  └─ atoms.js (Recoil state definitions)
+   │  │  └─ atoms.js (Recoil atoms/selectors)
    │  └─ components/
-   │     ├─ AnalysisSection.jsx
-   │     ├─ CoverLetterSection.jsx
-   │     ├─ ResultsContainer.jsx
-   │     ├─ ScoreSection.jsx
-   │     ├─ ToolSection.jsx
-   │     └─ ToolsMenu.jsx
+   │     ├─ NewHeader.jsx, HeroSection.jsx
+   │     ├─ ToolsSection.jsx (main + advanced tools)
+   │     ├─ ResultsUnified.jsx (all response cards)
+   │     ├─ ToolSection.jsx (generic renderer, legacy)
+   │     └─ ToolsMenu.jsx (legacy)
    └─ package.json
 ```
 
@@ -68,13 +68,18 @@ npm run dev
 ```
 Open `http://localhost:5173`.
 
+If PowerShell blocks `&&`, run commands separately:
+```
+cd frontend
+npm run dev
+```
+
 ## Usage
 1. Upload your resume (PDF)
-2. Paste a job description (optional but recommended)
-3. Use tools at the top:
-   - Analyze Resume, Score Match, Cover Letter
-   - More Tools: Rewrite Bullets, Skills Gap, Tailor Resume, Interview Questions, LinkedIn Suggestions
-4. Copy outputs and iterate on your resume
+2. Paste a job description (longer gives better results)
+3. Use Tools: Analyze, Score Match, Cover Letter
+4. Toggle Advanced Tools to access: Rewrite Bullets, Skills Gap, Tailor Resume, Interview Questions, LinkedIn
+5. Copy sections (Copy button) or Hide/Show for focus
 
 Sections can be collapsed/expanded; when you trigger a tool it auto-highlights and scrolls into view.
 
@@ -95,6 +100,11 @@ The application uses Recoil for efficient state management:
 - **Selective Re-renders**: Only components using changed atoms re-render
 - **Clean Architecture**: Each component manages its own state independently
 - **Easy Debugging**: Recoil DevTools for state inspection
+
+## UI/Theme
+- Tailwind `tailwind.config.js` reads HSL CSS variables from `src/index.css`
+- Utilities available: `bg-gradient-hero`, `bg-gradient-card`, `bg-gradient-button`, `shadow-glow-primary`, `shadow-card`, etc.
+- Response cards are in `components/ResultsUnified.jsx` with Copy and Hide/Show controls
 
 ## API (Backend)
 All endpoints expect `multipart/form-data` with:
