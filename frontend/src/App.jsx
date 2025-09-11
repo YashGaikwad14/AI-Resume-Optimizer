@@ -1,29 +1,38 @@
-import { useState } from "react";
+import { useRecoilState } from "recoil";
 import { marked } from "marked";
+import ResultsContainer from "./components/ResultsContainer";
+import ToolsMenu from "./components/ToolsMenu";
+import {
+  resumeFileState,
+  jobDescriptionState,
+  loadingState,
+  errorState,
+  resultsState,
+  scoreState,
+  coverLetterState,
+  rewriteBulletsState,
+  skillsGapState,
+  tailorState,
+  interviewQsState,
+  linkedinState,
+  activeSectionState
+} from "./Atoms/atoms";
 
 function App() {
-  const [resumeFile, setResumeFile] = useState(null);
-  const [jobDescription, setJobDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState("");
-  const [score, setScore] = useState(null);
-  const [coverLetter, setCoverLetter] = useState("");
-  const [showAnalysis, setShowAnalysis] = useState(true);
-  const [activeSection, setActiveSection] = useState("analysis"); // analysis | score | coverLetter | rewrite | skills | tailor | interview | linkedin
-  const [rewriteBullets, setRewriteBullets] = useState("");
-  const [skillsGap, setSkillsGap] = useState("");
-  const [tailor, setTailor] = useState("");
-  const [interviewQs, setInterviewQs] = useState("");
-  const [linkedin, setLinkedin] = useState("");
-  const [showToolsMenu, setShowToolsMenu] = useState(false);
-  const [showScore, setShowScore] = useState(true);
-  const [showCover, setShowCover] = useState(true);
-  const [showRewrite, setShowRewrite] = useState(true);
-  const [showSkills, setShowSkills] = useState(true);
-  const [showTailor, setShowTailor] = useState(true);
-  const [showInterview, setShowInterview] = useState(true);
-  const [showLinkedin, setShowLinkedin] = useState(true);
-  const [error, setError] = useState("");
+  // Recoil state hooks
+  const [resumeFile, setResumeFile] = useRecoilState(resumeFileState);
+  const [jobDescription, setJobDescription] = useRecoilState(jobDescriptionState);
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const [, setResults] = useRecoilState(resultsState);
+  const [, setScore] = useRecoilState(scoreState);
+  const [, setCoverLetter] = useRecoilState(coverLetterState);
+  const [, setActiveSection] = useRecoilState(activeSectionState);
+  const [, setRewriteBullets] = useRecoilState(rewriteBulletsState);
+  const [, setSkillsGap] = useRecoilState(skillsGapState);
+  const [, setTailor] = useRecoilState(tailorState);
+  const [, setInterviewQs] = useRecoilState(interviewQsState);
+  const [, setLinkedin] = useRecoilState(linkedinState);
+  const [error, setError] = useRecoilState(errorState);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -44,7 +53,6 @@ function App() {
     setError("");
     setResults("");
     setActiveSection("analysis");
-    setShowAnalysis(true);
 
     const formData = new FormData();
     formData.append("resume", resumeFile);
@@ -74,7 +82,6 @@ function App() {
     setError("");
     setScore(null);
     setActiveSection("score");
-    setShowAnalysis(false);
     const formData = new FormData();
     formData.append("resume", resumeFile);
     formData.append("jobDescription", jobDescription);
@@ -102,8 +109,6 @@ function App() {
     setError("");
     setCoverLetter("");
     setActiveSection("coverLetter");
-    setShowAnalysis(false);
-    setShowCover(true);
     const formData = new FormData();
     formData.append("resume", resumeFile);
     formData.append("jobDescription", jobDescription);
@@ -141,14 +146,6 @@ function App() {
     setLoading(true);
     setError("");
     setActiveSection(section);
-    setShowAnalysis(false);
-    // Ensure the selected section is expanded
-    if (section === 'skills') setShowSkills(true);
-    if (section === 'rewrite') setShowRewrite(true);
-    if (section === 'tailor') setShowTailor(true);
-    if (section === 'interview') setShowInterview(true);
-    if (section === 'linkedin') setShowLinkedin(true);
-    if (section === 'coverLetter') setShowCover(true);
     setState("");
     const formData = new FormData();
     formData.append("resume", resumeFile);
@@ -177,6 +174,21 @@ function App() {
     }
     const text = await res.text();
     throw new Error(`Server returned non-JSON (${res.status}). ${text.slice(0,200)}`);
+  };
+
+  const handleToolClick = (tool) => {
+    const setStateMap = {
+      'rewrite-bullets': setRewriteBullets,
+      'skills-gap': setSkillsGap,
+      'tailor': setTailor,
+      'interview-questions': setInterviewQs,
+      'linkedin': setLinkedin
+    };
+    
+    const setState = setStateMap[tool.path];
+    if (setState) {
+      callTool(tool.path, setState, tool.section);
+    }
   };
 
   return (
@@ -242,200 +254,16 @@ function App() {
                 Cover Letter
               </button>
             </div>
-            <div className="relative mt-3">
-              <button
-                className="btn-primary"
-                onClick={() => setShowToolsMenu((v) => !v)}
-                disabled={loading}
-              >
-                {showToolsMenu ? 'Hide Tools' : 'More Tools'}
-              </button>
-              {showToolsMenu && (
-                <div className="absolute z-10 mt-2 w-full md:w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-2 grid grid-cols-1 gap-2">
-                  <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100" disabled={loading} onClick={() => { setShowToolsMenu(false); callTool('rewrite-bullets', setRewriteBullets, 'rewrite'); }}>Rewrite Bullets</button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100" disabled={loading} onClick={() => { setShowToolsMenu(false); callTool('skills-gap', setSkillsGap, 'skills'); }}>Skills Gap</button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100" disabled={loading} onClick={() => { setShowToolsMenu(false); callTool('tailor', setTailor, 'tailor'); }}>Tailor Resume</button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100" disabled={loading} onClick={() => { setShowToolsMenu(false); callTool('interview-questions', setInterviewQs, 'interview'); }}>Interview Questions</button>
-                  <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100" disabled={loading} onClick={() => { setShowToolsMenu(false); callTool('linkedin', setLinkedin, 'linkedin'); }}>LinkedIn Suggestions</button>
-                </div>
-              )}
-            </div>
+            <ToolsMenu onToolClick={handleToolClick} />
 
             {error && (
               <div className="error-container">{error}</div>
             )}
           </div>
 
-          <div className={`results-container`}>
-            {loading && (
-              <div className="loading-overlay">
-                <div className="loading-spinner" />
-                <div className="mt-3 text-slate-700">Analyzing your resume...</div>
-              </div>
-            )}
-
-            {!loading && !results && !error && (
-              <div className="empty-state">
-                <div className="text-slate-600">Your analysis will appear here.</div>
-              </div>
-            )}
-
-            {!!results && (
-              <div className={`rounded-lg border border-slate-200 ${activeSection === 'analysis' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Resume Improvements</h3>
-                  <button
-                    className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200"
-                    onClick={() => setShowAnalysis((v) => !v)}
-                  >
-                    {showAnalysis ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-                {showAnalysis && (
-                  <div className="px-4 pb-4">
-                    <div className="prose-custom" dangerouslySetInnerHTML={{ __html: results }} />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!results && (
-              <div className="mt-3">
-                <button
-                  className="btn-primary"
-                  onClick={() => copyHtmlText(results)}
-                >
-                  Copy Improvements
-                </button>
-              </div>
-            )}
-
-            {score && (
-              <div id="section-score" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'score' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Match Score: {score.score}%</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowScore(v => !v)}>{showScore ? 'Hide' : 'Show'}</button>
-                </div>
-                {showScore && (
-                  <div className="px-4 pb-4">
-                    <p>Total keywords: {score.totalKeywords}</p>
-                    {score.matched?.length ? (
-                      <div>
-                        <strong>Matched keywords:</strong>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {score.matched.map((w) => (
-                            <span key={w} className="px-2 py-1 rounded bg-indigo-100 text-indigo-700 text-sm">{w}</span>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                    {score.flags?.length ? (
-                      <div className="mt-4">
-                        <strong>Flags:</strong>
-                        <ul className="list-disc pl-6">
-                          {score.flags.map((f, i) => (
-                            <li key={i}>{f}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!coverLetter && (
-              <div id="section-coverLetter" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'coverLetter' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Cover Letter</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowCover(v => !v)}>{showCover ? 'Hide' : 'Show'}</button>
-                </div>
-                {showCover && (
-                  <div className="px-4 pb-4">
-                    <div dangerouslySetInnerHTML={{ __html: coverLetter }} />
-                    <div className="mt-3">
-                      <button className="btn-primary" onClick={() => copyHtmlText(coverLetter)}>Copy Cover Letter</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!rewriteBullets && (
-              <div id="section-rewrite" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'rewrite' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Rewritten Bullets</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowRewrite(v => !v)}>{showRewrite ? 'Hide' : 'Show'}</button>
-                </div>
-                {showRewrite && (
-                  <div className="px-4 pb-4">
-                    <div dangerouslySetInnerHTML={{ __html: rewriteBullets }} />
-                    <div className="mt-3"><button className="btn-primary" onClick={() => copyHtmlText(rewriteBullets)}>Copy Bullets</button></div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!skillsGap && (
-              <div id="section-skills" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'skills' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Skills Gap & Roadmap</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowSkills(v => !v)}>{showSkills ? 'Hide' : 'Show'}</button>
-                </div>
-                {showSkills && (
-                  <div className="px-4 pb-4">
-                    <div dangerouslySetInnerHTML={{ __html: skillsGap }} />
-                    <div className="mt-3"><button className="btn-primary" onClick={() => copyHtmlText(skillsGap)}>Copy Roadmap</button></div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!tailor && (
-              <div id="section-tailor" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'tailor' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Tailored Mapping</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowTailor(v => !v)}>{showTailor ? 'Hide' : 'Show'}</button>
-                </div>
-                {showTailor && (
-                  <div className="px-4 pb-4">
-                    <div dangerouslySetInnerHTML={{ __html: tailor }} />
-                    <div className="mt-3"><button className="btn-primary" onClick={() => copyHtmlText(tailor)}>Copy Mapping</button></div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!interviewQs && (
-              <div id="section-interview" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'interview' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">Interview Questions</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowInterview(v => !v)}>{showInterview ? 'Hide' : 'Show'}</button>
-                </div>
-                {showInterview && (
-                  <div className="px-4 pb-4">
-                    <div dangerouslySetInnerHTML={{ __html: interviewQs }} />
-                    <div className="mt-3"><button className="btn-primary" onClick={() => copyHtmlText(interviewQs)}>Copy Questions</button></div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!!linkedin && (
-              <div id="section-linkedin" className={`scroll-offset prose-custom mt-6 rounded-lg border border-slate-200 ${activeSection === 'linkedin' ? 'ring-2 ring-indigo-500' : ''}`}>
-                <div className="flex items-center justify-between px-4 py-3 bg-white/70 rounded-t-lg">
-                  <h3 className="font-semibold text-slate-800">LinkedIn Suggestions</h3>
-                  <button className="text-sm px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200" onClick={() => setShowLinkedin(v => !v)}>{showLinkedin ? 'Hide' : 'Show'}</button>
-                </div>
-                {showLinkedin && (
-                  <div className="px-4 pb-4">
-                    <div dangerouslySetInnerHTML={{ __html: linkedin }} />
-                    <div className="mt-3"><button className="btn-primary" onClick={() => copyHtmlText(linkedin)}>Copy Suggestions</button></div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <ResultsContainer
+            copyHtmlText={copyHtmlText}
+          />
         </div>
       </div>
     </div>

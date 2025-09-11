@@ -6,7 +6,7 @@
   }
 
   .card-primary {
-    @apply bg-white/95 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl max-w-7xl w-full p-8 md:p-10 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+    @apply bg-white/95 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl max-w-4xl w-full p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
   }
 
   .app-header {
@@ -27,7 +27,7 @@
   }
 
   .responsive-grid {
-    @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-8;
   }
 
   .form-section {
@@ -60,15 +60,7 @@
   }
 
   .results-container {
-    @apply bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 md:p-10 min-h-[420px] relative border border-slate-200 overflow-hidden;
-  }
-  .prose-custom {
-    @apply max-w-none text-base md:text-lg;
-  }
-
-  /* Ensure smooth scroll anchors account for sticky header height */
-  .scroll-offset {
-    scroll-margin-top: 96px;
+    @apply bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 min-h-[300px] relative border border-slate-200 overflow-hidden;
   }
 
   .results-container::before {

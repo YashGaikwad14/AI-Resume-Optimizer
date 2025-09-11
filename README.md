@@ -16,7 +16,7 @@ An end-to-end app that analyzes your PDF resume, scores it against a job descrip
 - Clean UI with collapsible sections and deep-link scrolling
 
 ## Tech Stack
-- Frontend: React (Vite), Tailwind CSS v3
+- Frontend: React (Vite), Tailwind CSS v3, Recoil (State Management)
 - Backend: Node.js (Express), `multer` (PDF upload), `pdf-parse` (text extraction)
 - AI: Google Gemini (generateContent API)
 
@@ -29,7 +29,15 @@ An end-to-end app that analyzes your PDF resume, scores it against a job descrip
 └─ frontend/
    ├─ src/
    │  ├─ App.jsx, App.css, index.css, main.jsx, About.jsx
-   │  └─ ...
+   │  ├─ Atoms/
+   │  │  └─ atoms.js (Recoil state definitions)
+   │  └─ components/
+   │     ├─ AnalysisSection.jsx
+   │     ├─ CoverLetterSection.jsx
+   │     ├─ ResultsContainer.jsx
+   │     ├─ ScoreSection.jsx
+   │     ├─ ToolSection.jsx
+   │     └─ ToolsMenu.jsx
    └─ package.json
 ```
 
@@ -69,6 +77,24 @@ Open `http://localhost:5173`.
 4. Copy outputs and iterate on your resume
 
 Sections can be collapsed/expanded; when you trigger a tool it auto-highlights and scrolls into view.
+
+## State Management (Recoil)
+
+The application uses Recoil for efficient state management:
+
+### State Organization
+- **File & Input States**: `resumeFileState`, `jobDescriptionState`
+- **Loading & Error States**: `loadingState`, `errorState`
+- **Results States**: `resultsState`, `scoreState`, `coverLetterState`
+- **Tool Results**: `rewriteBulletsState`, `skillsGapState`, `tailorState`, `interviewQsState`, `linkedinState`
+- **UI States**: `activeSectionState`, `showToolsMenuState`
+- **Component Visibility**: `showAnalysisState`, `showScoreState`, `showCoverState`, etc.
+
+### Benefits
+- **No Prop Drilling**: Components access state directly via Recoil hooks
+- **Selective Re-renders**: Only components using changed atoms re-render
+- **Clean Architecture**: Each component manages its own state independently
+- **Easy Debugging**: Recoil DevTools for state inspection
 
 ## API (Backend)
 All endpoints expect `multipart/form-data` with:
