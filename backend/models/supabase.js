@@ -35,10 +35,10 @@ async function saveRecord(payload) {
   return saveEvent('records', payload);
 }
 
-async function recentRecords(type, limit = 20) {
+async function recentRecords(userId, type, limit = 20) {
   try {
     if (!supabase) return { skipped: true };
-    let query = supabase.from('records').select('*').order('created_at', { ascending: false }).limit(limit);
+    let query = supabase.from('records').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(limit);
     if (type) query = query.eq('type', type);
     const { data, error } = await query;
     if (error) throw error;
@@ -49,10 +49,10 @@ async function recentRecords(type, limit = 20) {
   }
 }
 
-async function searchRecords(q, type, limit = 50) {
+async function searchRecords(userId, q, type, limit = 50) {
   try {
     if (!supabase) return { skipped: true };
-    let query = supabase.from('records').select('*').order('created_at', { ascending: false }).limit(limit);
+    let query = supabase.from('records').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(limit);
     if (type) query = query.eq('type', type);
     if (q) query = query.ilike('content', `%${q}%`);
     const { data, error } = await query;

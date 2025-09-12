@@ -1,6 +1,6 @@
 # AI Resume Optimizer
 
-A comprehensive, mobile-friendly resume optimization platform that analyzes your PDF resume, scores it against job descriptions, generates tailored content, and provides premium career tools with user authentication and subscription management.
+A comprehensive, AI-powered resume optimization platform that analyzes your PDF resume, scores it against job descriptions, generates tailored content, and provides premium career tools with user authentication and history tracking.
 
 ## ✨ Features
 
@@ -28,6 +28,13 @@ A comprehensive, mobile-friendly resume optimization platform that analyzes your
 - **Premium Subscriptions** - Tiered access to advanced tools
 - **User Profiles** - Personalized experience with subscription status
 - **Session Management** - Secure token-based authentication
+- **History Tracking** - View and access your past resume analyses
+
+### 📊 History & Analytics
+- **Analysis History** - Track all your resume optimizations
+- **Quick Access** - Click any history item to jump to that section
+- **Slide-out Sidebar** - Clean history interface with search
+- **User-specific Data** - Only see your own analysis history
 
 ## 🛠 Tech Stack
 
@@ -45,11 +52,13 @@ A comprehensive, mobile-friendly resume optimization platform that analyzes your
 - **Multer** for PDF file handling
 - **PDF-Parse** for text extraction
 - **Google Gemini AI** for content generation
+- **Nodemailer** for email functionality
 
 ### Database
-- **Supabase PostgreSQL** for user data and premium status
+- **Supabase PostgreSQL** for user data and analysis history
 - **JWT tokens** for session management
 - **Password hashing** with bcrypt
+- **Row Level Security** for data protection
 
 ## 📁 Project Structure
 
@@ -58,11 +67,11 @@ AI-Resume-Optimizer/
 ├── backend/
 │   ├── models/
 │   │   ├── auth.js          # Authentication & user management
-│   │   ├── supabase.js      # Database connection
+│   │   ├── supabase.js      # Database connection & history
 │   │   └── gemini.js        # AI API configuration
 │   ├── routes/
-│   │   └── auth.js          # Auth endpoints (/signup, /signin, /me, /upgrade)
-│   ├── server.js            # Main server with premium-gated endpoints
+│   │   └── auth.js          # Auth endpoints (/signup, /signin, /forgot, /reset)
+│   ├── server.js            # Main server with all endpoints
 │   └── package.json
 ├── frontend/
 │   ├── src/
@@ -70,15 +79,18 @@ AI-Resume-Optimizer/
 │   │   │   ├── NewHeader.jsx        # Mobile-responsive navigation
 │   │   │   ├── ToolsSection.jsx     # Free & premium tools UI
 │   │   │   ├── ResultsUnified.jsx   # Results display with mobile optimization
-│   │   │   └── ProtectedRoute.jsx   # Route protection
+│   │   │   ├── ProtectedRoute.jsx   # Route protection
+│   │   │   └── HistorySidebar.jsx   # Analysis history sidebar
 │   │   ├── pages/
 │   │   │   ├── SignIn.jsx           # Authentication pages
 │   │   │   ├── SignUp.jsx
-│   │   │   ├── Pricing.jsx          # Premium subscription page
-│   │   │   └── ForgotPassword.jsx
+│   │   │   ├── ForgotPassword.jsx   # Password reset
+│   │   │   ├── ResetPassword.jsx    # Password reset confirmation
+│   │   │   └── Pricing.jsx          # Premium subscription page
 │   │   ├── Atoms/
 │   │   │   └── atoms.js             # Recoil state management
 │   │   ├── App.jsx                  # Main application component
+│   │   ├── About.jsx                # Landing page with features
 │   │   └── main.jsx                 # Router configuration
 │   └── package.json
 ├── README.md
@@ -91,6 +103,7 @@ AI-Resume-Optimizer/
 - **Node.js 18+**
 - **Google Gemini API Key**
 - **Supabase Account** (for database)
+- **SMTP Email Service** (for password resets)
 
 ### 1. Clone & Install
 ```bash
@@ -121,37 +134,56 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 # JWT Configuration
 JWT_SECRET=your_jwt_secret_key
 
-# Email Configuration (Optional)
-SMTP_HOST=smtp.gmail.com
+# Email Configuration (Required for password reset)
+SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_app_password
 SMTP_SECURE=false
-MAIL_FROM=your_email@gmail.com
+SMTP_USER=apikey
+SMTP_PASS=your_sendgrid_api_key
+MAIL_FROM=no-reply@yourdomain.com
 APP_BASE_URL=http://localhost:5173
 ```
 
 **Database Setup** (Supabase):
 1. Create a new Supabase project
-2. Run this SQL to create the users table:
+2. Run this SQL to create the required tables:
 ```sql
+-- Users table
 CREATE TABLE users (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  is_premium BOOLEAN DEFAULT false NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  email text UNIQUE NOT NULL,
+  password_hash text NOT NULL,
+  name text NOT NULL,
+  is_premium boolean DEFAULT false NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now()
 );
 
+-- Password resets table
 CREATE TABLE password_resets (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  token VARCHAR(64) UNIQUE NOT NULL,
-  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id bigint REFERENCES users(id) ON DELETE CASCADE,
+  token text UNIQUE NOT NULL,
+  expires_at timestamp with time zone NOT NULL,
+  created_at timestamp with time zone DEFAULT now()
 );
+
+-- Records table for analysis history
+CREATE TABLE records (
+  id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id bigint REFERENCES users(id) ON DELETE CASCADE,
+  type text NOT NULL,
+  content text NOT NULL,
+  created_at timestamp with time zone DEFAULT now()
+);
+
+-- Indexes for performance
+CREATE INDEX idx_password_resets_user_id ON password_resets(user_id);
+CREATE INDEX idx_records_user_id ON records(user_id);
+CREATE INDEX idx_records_created_at ON records(created_at DESC);
+
+-- Disable RLS for now (simpler for custom auth)
+ALTER TABLE records DISABLE ROW LEVEL SECURITY;
 ```
 
 ### 3. Start Development Servers
@@ -202,6 +234,12 @@ npm run dev
 - **Premium Gating** - Tools locked behind subscription
 - **User Status** - Visual premium indicators
 
+### History Tracking
+- **Analysis History** - View all past resume analyses
+- **Quick Navigation** - Click history items to jump to sections
+- **User-Specific** - Only see your own analysis history
+- **Real-time Updates** - History updates as you use tools
+
 ## 🎨 UI/UX Features
 
 ### Design System
@@ -216,14 +254,13 @@ npm run dev
 - **Auto-Scroll** to results when generated
 - **Loading States** with visual feedback
 - **Error Handling** with user-friendly messages
+- **History Sidebar** with slide-out animation
 
 ## 🔌 API Endpoints
 
 ### Authentication
 - `POST /auth/signup` - User registration
 - `POST /auth/signin` - User login
-- `GET /auth/me` - Get user profile
-- `POST /auth/upgrade` - Upgrade to premium (demo)
 - `POST /auth/forgot` - Password reset request
 - `POST /auth/reset` - Password reset confirmation
 
@@ -240,14 +277,19 @@ npm run dev
 - `POST /premium/interview-questions` - Interview prep
 - `POST /premium/linkedin` - LinkedIn optimization
 
+### History & Records
+- `GET /records/recent` - Get user's analysis history
+- `GET /records/search` - Search through analysis history
+
 ## 🛡 Security Features
 
 - **Password Hashing** with bcrypt
 - **JWT Token** authentication
 - **CORS** protection
 - **Input Validation** with Zod schemas
-- **Rate Limiting** (recommended for production)
+- **User-specific Data** - History filtered by user
 - **Environment Variables** for sensitive data
+- **Email Verification** for password resets
 
 ## 📊 State Management
 
@@ -285,6 +327,7 @@ npm start
 - Use production database URLs
 - Configure proper CORS origins
 - Set up email service for password resets
+- Update APP_BASE_URL to production domain
 
 ## 🐛 Troubleshooting
 
@@ -293,12 +336,15 @@ npm start
 - **CORS errors** - Ensure backend CORS is configured for frontend URL
 - **Database connection** - Verify Supabase credentials and table setup
 - **Premium not working** - Check `is_premium` column exists in users table
+- **Email not sending** - Verify SMTP credentials and SendGrid setup
+- **History not showing** - Check user_id is being saved with records
 
 ### Development Tips
 - Use Recoil DevTools for state debugging
 - Check browser console for API errors
 - Verify environment variables are loaded
 - Test mobile responsiveness with browser dev tools
+- Check Supabase logs for database issues
 
 ## 🗺 Roadmap
 
@@ -311,6 +357,8 @@ npm start
 - **Team Accounts** - Shared premium subscriptions
 - **API Rate Limiting** - Production-ready rate limiting
 - **Advanced ATS Rules** - Industry-specific ATS optimization
+- **History Search** - Search through analysis history
+- **Bulk Operations** - Process multiple resumes at once
 
 ## 📄 License
 

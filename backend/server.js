@@ -3,6 +3,7 @@
 const express = require("express");
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
+const jwt = require("jsonwebtoken");
 
 const cors = require("cors");
 
@@ -13,6 +14,18 @@ app.use(express.json());
 
 require("dotenv").config(); 
 const { saveEvent, saveRecord, recentRecords, searchRecords } = require("./models/supabase");
+
+// Helper function to get user_id from request
+function getUserIdFromRequest(req) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return null;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-change-me');
+    return decoded.user_id;
+  } catch (err) {
+    return null;
+  }
+}
 
 const { GEMINI_API_KEY, GEMINI_URL } = require("./models/gemini");
 const authRouter = require('./routes/auth');
@@ -109,7 +122,8 @@ Format strictly in Markdown in field of related jobs suggest jobs he can apply t
       "No response from AI";
 
     // Persist minimal record
-    saveRecord({ type: 'analyze', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'analyze', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -137,7 +151,8 @@ app.post("/score", upload.single("resume"), async (req, res) => {
     if (!/email|@/.test(resumeText)) flags.push("Missing email contact");
     if (!/skills/.test(resumeText)) flags.push("Missing skills section");
 
-    saveRecord({ type: 'score', content: JSON.stringify({ score, matched, totalKeywords: words.length, flags }), created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'score', content: JSON.stringify({ score, matched, totalKeywords: words.length, flags }), created_at: new Date().toISOString(), user_id: userId });
     res.json({ score, matched, totalKeywords: words.length, flags });
   } catch (err) {
     console.error(err);
@@ -178,7 +193,8 @@ app.post("/cover-letter", upload.single("resume"), async (req, res) => {
       result?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "No response from AI";
 
-    saveRecord({ type: 'cover_letter', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'cover_letter', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -202,7 +218,8 @@ app.post("/premium/rewrite-bullets", requirePremium, upload.single("resume"), as
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-    saveRecord({ type: 'rewrite_bullets', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'rewrite_bullets', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -225,7 +242,8 @@ app.post("/premium/skills-gap", requirePremium, upload.single("resume"), async (
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-    saveRecord({ type: 'skills_gap', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'skills_gap', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -248,7 +266,8 @@ app.post("/premium/tailor", requirePremium, upload.single("resume"), async (req,
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-    saveRecord({ type: 'tailor', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'tailor', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -271,7 +290,8 @@ app.post("/premium/interview-questions", requirePremium, upload.single("resume")
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-    saveRecord({ type: 'interview_questions', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'interview_questions', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -294,7 +314,8 @@ app.post("/premium/linkedin", requirePremium, upload.single("resume"), async (re
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-    saveRecord({ type: 'linkedin', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'linkedin', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -304,17 +325,33 @@ app.post("/premium/linkedin", requirePremium, upload.single("resume"), async (re
 
 // Search & recent endpoints
 app.get('/records/recent', async (req, res) => {
-  const { type, limit } = req.query;
-  const { data, error } = await recentRecords(type, Number(limit) || 20);
-  if (error) return res.status(500).json({ error });
-  res.json({ data });
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Authentication required' });
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-change-me');
+    const { type, limit } = req.query;
+    const { data, error } = await recentRecords(decoded.user_id, type, Number(limit) || 20);
+    if (error) return res.status(500).json({ error });
+    res.json({ data });
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
 });
 
 app.get('/records/search', async (req, res) => {
-  const { q, type, limit } = req.query;
-  const { data, error } = await searchRecords(q || '', type, Number(limit) || 50);
-  if (error) return res.status(500).json({ error });
-  res.json({ data });
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Authentication required' });
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-change-me');
+    const { q, type, limit } = req.query;
+    const { data, error } = await searchRecords(decoded.user_id, q || '', type, Number(limit) || 50);
+    if (error) return res.status(500).json({ error });
+    res.json({ data });
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
 });
 
 const PORT = 5000;

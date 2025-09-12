@@ -1,9 +1,11 @@
 import { useRecoilState } from "recoil";
+import { useState } from "react";
 import { marked } from "marked";
 import ResultsUnified from "./components/ResultsUnified";
 import ToolsSection from "./components/ToolsSection";
 import NewHeader from "./components/NewHeader";
 import HeroSection from "./components/HeroSection";
+import HistorySidebar from "./components/HistorySidebar";
 import {
   resumeFileState,
   jobDescriptionState,
@@ -22,6 +24,15 @@ import {
 } from "./Atoms/atoms";
 
 function App() {
+  // Local state for sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Helper function to get auth headers
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+  
   // Recoil state hooks
   const [resumeFile, setResumeFile] = useRecoilState(resumeFileState);
   const [jobDescription, setJobDescription] = useRecoilState(jobDescriptionState);
@@ -65,6 +76,7 @@ function App() {
     try {
       const res = await fetch("http://localhost:5000/analyze", {
         method: "POST",
+        headers: getAuthHeaders(),
         body: formData,
       });
       const data = await parseResponse(res);
@@ -92,6 +104,7 @@ function App() {
     try {
       const res = await fetch("http://localhost:5000/score", {
         method: "POST",
+        headers: getAuthHeaders(),
         body: formData,
       });
       const data = await parseResponse(res);
@@ -119,6 +132,7 @@ function App() {
     try {
       const res = await fetch("http://localhost:5000/cover-letter", {
         method: "POST",
+        headers: getAuthHeaders(),
         body: formData,
       });
       const data = await parseResponse(res);
@@ -202,7 +216,7 @@ function App() {
   return (
     <div className="main-container">
       <div className="max-w-6xl w-full mx-auto px-4 sm:px-6">
-        <NewHeader />
+        <NewHeader onHistoryClick={() => setIsSidebarOpen(true)} />
         <HeroSection />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="rounded-2xl border border-border bg-secondary p-4 sm:p-6">
@@ -279,6 +293,12 @@ function App() {
           <ResultsUnified />
         </div>
       </div>
+      
+      {/* History Sidebar */}
+      <HistorySidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
     </div>
   );
 }

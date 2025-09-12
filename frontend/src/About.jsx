@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import NewHeader from "./components/NewHeader";
 
 export default function About() {
@@ -7,8 +8,24 @@ export default function About() {
         <NewHeader />
         <div className="pt-16">
         <section className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">About AI Resume Optimizer</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">Transform your career prospects with our cutting-edge AI technology that optimizes your resume for any job opportunity.</p>
+          <h1 className="text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">AI Resume Optimizer</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">Transform your career prospects with our cutting-edge AI technology that optimizes your resume for any job opportunity.</p>
+          
+          {/* Call to Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              to="/signup" 
+              className="btn-primary bg-gradient-button px-8 py-3 rounded-xl text-lg font-semibold hover:shadow-glow-primary transition-all duration-300"
+            >
+              Get Started Free
+            </Link>
+            <Link 
+              to="/signin" 
+              className="px-8 py-3 rounded-xl text-lg font-semibold border border-border bg-background/50 hover:bg-background text-foreground transition-all duration-300"
+            >
+              Sign In
+            </Link>
+          </div>
         </section>
 
         <section className="mb-16">
@@ -74,7 +91,7 @@ export default function About() {
 
         {/* How to Use */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-12 text-center bg-gradient-primary bg-clip-text text-transparent">How to Use AI Resume Optimizer</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center bg-gradient-primary bg-clip-text text-transparent">How to Use ResumUp</h2>
           <div className="grid lg:grid-cols-3 gap-8">
             {[{
               title: 'Upload Your Resume',
