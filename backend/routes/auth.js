@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { SignUpSchema, SignInSchema, getUserByEmail, createUser, signToken, ForgotSchema, ResetSchema, createResetToken, consumeResetToken, updatePassword } = require('../models/auth');
+const { SignUpSchema, SignInSchema, getUserByEmail, createUser, signToken, ForgotSchema, ResetSchema, createResetToken, consumeResetToken, updatePassword, sendResetEmail, verifyToken, getUserById } = require('../models/auth');
 const bcrypt = require('bcryptjs');
 
 router.post('/signup', async (req, res) => {
@@ -55,7 +55,9 @@ router.post('/forgot', async (req, res) => {
     if (!found.data) return res.json({ ok: true }); // do not leak
     const created = await createResetToken(found.data.id);
     if (created.error) return res.status(500).json({ error: created.error });
-    // TODO: email token - for now return token in response for testing
+    // Send email if SMTP configured; still return token for dev
+    const appBaseUrl = req.headers['x-app-base-url'] || process.env.APP_BASE_URL;
+    await sendResetEmail({ to: email, token: created.token, appBaseUrl });
     res.json({ ok: true, token: created.token });
   } catch (err) {
     res.status(500).json({ error: 'Request failed' });
@@ -75,6 +77,40 @@ router.post('/reset', async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Reset failed' });
+  }
+});
+
+// Get current user profile (includes premium status)
+router.get('/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) return res.status(401).json({ error: 'Missing token' });
+    const v = verifyToken(token);
+    if (v.error) return res.status(401).json({ error: v.error });
+    const user = await getUserById(v.claim.user_id);
+    if (user.error) return res.status(500).json({ error: user.error });
+    res.json({ user: user.data });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// Fake upgrade endpoint to toggle premium (for demo/testing)
+router.post('/upgrade', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) return res.status(401).json({ error: 'Missing token' });
+    const v = verifyToken(token);
+    if (v.error) return res.status(401).json({ error: v.error });
+    if (!require('../models/supabase').supabase) return res.status(500).json({ error: 'supabase not configured' });
+    const { supabase } = require('../models/supabase');
+    const { error } = await supabase.from('users').update({ is_premium: true }).eq('id', v.claim.user_id);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to upgrade' });
   }
 });
 

@@ -17,6 +17,7 @@ import {
   tailorState,
   interviewQsState,
   linkedinState,
+  atsOptimizerState,
   activeSectionState
 } from "./Atoms/atoms";
 
@@ -34,6 +35,7 @@ function App() {
   const [, setTailor] = useRecoilState(tailorState);
   const [, setInterviewQs] = useRecoilState(interviewQsState);
   const [, setLinkedin] = useRecoilState(linkedinState);
+  const [, setAtsOptimizer] = useRecoilState(atsOptimizerState);
   const [error, setError] = useRecoilState(errorState);
 
   const handleFileChange = (e) => {
@@ -153,7 +155,10 @@ function App() {
     formData.append("resume", resumeFile);
     formData.append("jobDescription", jobDescription);
     try {
-      const res = await fetch(`http://localhost:5000/${path}`, { method: "POST", body: formData });
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`http://localhost:5000/${path}`, { method: "POST", body: formData, headers });
       const data = await parseResponse(res);
       if (data.error) throw new Error(data.error);
       setState(marked(data.result));
@@ -180,11 +185,12 @@ function App() {
 
   const handleToolClick = (tool) => {
     const setStateMap = {
-      'rewrite-bullets': setRewriteBullets,
-      'skills-gap': setSkillsGap,
-      'tailor': setTailor,
-      'interview-questions': setInterviewQs,
-      'linkedin': setLinkedin
+      'premium/rewrite-bullets': setRewriteBullets,
+      'premium/skills-gap': setSkillsGap,
+      'premium/tailor': setTailor,
+      'premium/interview-questions': setInterviewQs,
+      'premium/linkedin': setLinkedin,
+      'premium/ats-optimizer': setAtsOptimizer
     };
     
     const setState = setStateMap[tool.path];
@@ -195,11 +201,11 @@ function App() {
 
   return (
     <div className="main-container">
-      <div className="max-w-6xl w-full mx-auto px-4">
+      <div className="max-w-6xl w-full mx-auto px-4 sm:px-6">
         <NewHeader />
         <HeroSection />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-border bg-secondary p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="rounded-2xl border border-border bg-secondary p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Inputs</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
@@ -232,12 +238,12 @@ function App() {
                 <div className="rounded-xl border border-border bg-background/50 p-3">
                   <textarea
                     id="jd-area"
-                    className="w-full h-48 p-3 bg-transparent outline-none text-foreground placeholder:text-muted-foreground transition-smooth"
+                    className="w-full h-32 sm:h-48 p-3 bg-transparent outline-none text-foreground placeholder:text-muted-foreground transition-smooth resize-none"
                     placeholder="Paste the complete job description... (requirements, responsibilities, company info)"
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                   />
-                  <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 text-xs text-muted-foreground gap-1">
                     <span>Tip: richer JDs yield better analysis.</span>
                     <span>{jobDescription.length} chars</span>
                   </div>
@@ -245,7 +251,7 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-secondary p-6">
+          <div className="rounded-2xl border border-border bg-secondary p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Tools</h3>
             <ToolsSection 
               onAnalyze={analyzeResume}

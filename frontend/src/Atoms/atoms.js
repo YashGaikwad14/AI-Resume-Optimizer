@@ -64,6 +64,11 @@ export const linkedinState = atom({
   default: '',
 });
 
+export const atsOptimizerState = atom({
+  key: 'atsOptimizerState',
+  default: '',
+});
+
 // UI states
 export const activeSectionState = atom({
   key: 'activeSectionState',
@@ -111,7 +116,18 @@ export const showLinkedinState = atom({
   default: true,
 });
 
+export const showAtsOptimizerState = atom({
+  key: 'showAtsOptimizerState',
+  default: true,
+});
+
 export const showToolsMenuState = atom({
   key: 'showToolsMenuState',
   default: false,
+});
+
+// Auth/profile state
+export const userProfileState = atom({
+  key: 'userProfileState',
+  default: { id: null, email: '', name: '', is_premium: false },
 });

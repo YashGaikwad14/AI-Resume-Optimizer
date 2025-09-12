@@ -80,4 +80,35 @@
       transform: rotate(360deg);
     }
   }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 640px) {
+    .file-drop-zone {
+      @apply min-h-[120px] p-4;
+    }
+    
+    .btn-primary {
+      @apply text-sm py-2 px-4;
+    }
+    
+    .prose-custom {
+      @apply text-sm;
+    }
+    
+    .prose-custom h1, .prose-custom h2, .prose-custom h3 {
+      @apply text-base;
+    }
+    
+    .prose-custom ul, .prose-custom ol {
+      @apply pl-4;
+    }
+    
+    .prose-custom table {
+      @apply text-xs;
+    }
+    
+    .prose-custom th, .prose-custom td {
+      @apply px-2 py-1;
+    }
+  }
 }

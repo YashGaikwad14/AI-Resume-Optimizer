@@ -16,8 +16,49 @@ const { saveEvent, saveRecord, recentRecords, searchRecords } = require("./model
 
 const { GEMINI_API_KEY, GEMINI_URL } = require("./models/gemini");
 const authRouter = require('./routes/auth');
+const { verifyToken, getUserById } = require('./models/auth');
 // Auth endpoints
 app.use('/auth', authRouter);
+// Middleware to gate premium endpoints
+function requirePremium(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) return res.status(401).json({ error: 'Missing token' });
+    const v = verifyToken(token);
+    if (v.error) return res.status(401).json({ error: v.error });
+    getUserById(v.claim.user_id).then((resp) => {
+      if (resp.error) return res.status(500).json({ error: resp.error });
+      if (!resp.data.is_premium) return res.status(402).json({ error: 'Premium required' });
+      req.user = resp.data;
+      next();
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Auth failed' });
+  }
+}
+
+// Example premium-only tool: ATS optimizer
+app.post('/premium/ats-optimizer', requirePremium, upload.single('resume'), async (req, res) => {
+  try {
+    const fileBuffer = req.file.buffer;
+    const jobDescription = req.body.jobDescription || '';
+    const pdfData = await pdfParse(fileBuffer);
+    const resumeText = pdfData.text;
+    const systemPrompt = `Evaluate resume against ATS parsing rules and optimize formatting, keywords, and structure. Output Markdown with specific, actionable edits and a before/after example for 3 bullets.`;
+    const userQuery = `Resume:\n${resumeText}\n\nTarget JD:\n${jobDescription}`;
+    const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+    const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!response.ok) return res.status(500).json({ error: 'Gemini API request failed' });
+    const result = await response.json();
+    const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+    saveRecord({ type: 'premium_ats_optimizer', content: output, created_at: new Date().toISOString() });
+    res.json({ result: output });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to run premium ATS optimizer' });
+  }
+});
 
 app.post("/analyze", upload.single("resume"), async (req, res) => {
   try {
@@ -146,7 +187,7 @@ app.post("/cover-letter", upload.single("resume"), async (req, res) => {
 });
 
 // Rewrite resume bullets using STAR, quantification, action verbs
-app.post("/rewrite-bullets", upload.single("resume"), async (req, res) => {
+app.post("/premium/rewrite-bullets", requirePremium, upload.single("resume"), async (req, res) => {
   try {
     const fileBuffer = req.file.buffer;
     const jobDescription = req.body.jobDescription || "";
@@ -170,7 +211,7 @@ app.post("/rewrite-bullets", upload.single("resume"), async (req, res) => {
 });
 
 // Skills gaps and learning roadmap
-app.post("/skills-gap", upload.single("resume"), async (req, res) => {
+app.post("/premium/skills-gap", requirePremium, upload.single("resume"), async (req, res) => {
   try {
     const fileBuffer = req.file.buffer;
     const jobDescription = req.body.jobDescription || "";
@@ -193,7 +234,7 @@ app.post("/skills-gap", upload.single("resume"), async (req, res) => {
 });
 
 // Tailor resume mapping to JD keywords/requirements
-app.post("/tailor", upload.single("resume"), async (req, res) => {
+app.post("/premium/tailor", requirePremium, upload.single("resume"), async (req, res) => {
   try {
     const fileBuffer = req.file.buffer;
     const jobDescription = req.body.jobDescription || "";
@@ -216,7 +257,7 @@ app.post("/tailor", upload.single("resume"), async (req, res) => {
 });
 
 // Interview questions based on resume and JD
-app.post("/interview-questions", upload.single("resume"), async (req, res) => {
+app.post("/premium/interview-questions", requirePremium, upload.single("resume"), async (req, res) => {
   try {
     const fileBuffer = req.file.buffer;
     const jobDescription = req.body.jobDescription || "";
@@ -239,7 +280,7 @@ app.post("/interview-questions", upload.single("resume"), async (req, res) => {
 });
 
 // LinkedIn headline and summary suggestions
-app.post("/linkedin", upload.single("resume"), async (req, res) => {
+app.post("/premium/linkedin", requirePremium, upload.single("resume"), async (req, res) => {
   try {
     const fileBuffer = req.file.buffer;
     const jobDescription = req.body.jobDescription || "";
@@ -254,6 +295,12 @@ app.post("/linkedin", upload.single("resume"), async (req, res) => {
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
     saveRecord({ type: 'linkedin', content: output, created_at: new Date().toISOString() });
+    res.json({ result: output });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to generate LinkedIn suggestions" });
+  }
+});
 
 // Search & recent endpoints
 app.get('/records/recent', async (req, res) => {
@@ -268,12 +315,6 @@ app.get('/records/search', async (req, res) => {
   const { data, error } = await searchRecords(q || '', type, Number(limit) || 50);
   if (error) return res.status(500).json({ error });
   res.json({ data });
-});
-    res.json({ result: output });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to generate LinkedIn suggestions" });
-  }
 });
 
 const PORT = 5000;

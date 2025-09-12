@@ -1,23 +1,908 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production builds
+dist/
+build/
+out/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
-yarn-*.log*
+yarn-debug.log*
+yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies
-node_modules/
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
 
-# Env
-.env
-.env.*
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output/
 
-# OS/editor
-.DS_Store
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# MacOS
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Local development
+.local/
+.localhost/
+
+# Deployment platforms
+.vercel/
+.netlify/
+.railway/
+.heroku/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Configuration backups
+config.backup.*
+settings.backup.*
+
+# AI Resume Optimizer Backend specific
+# User uploads
+uploads/
+user_files/
+resume_uploads/
+temp_uploads/
+
+# Generated files
+generated/
+exports/
+output/
+processed_files/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+database.sqlite
+
+# Database dumps
+*.sql
+*.dump
+backup.sql
+
+# AI model cache
+ai_cache/
+model_cache/
+gemini_cache/
+
+# Premium user data exports
+user_exports/
+subscription_data/
+
+# Session data
+sessions/
+session_store/
+
+# File processing
+processing/
+temp_processing/
+
+# Email templates (if stored locally)
+email_templates/
+mail_templates/
+
+# API documentation
+api_docs/
+swagger/
+
+# Test files
+test_files/
+test_uploads/
+test_data/
+
+# Performance monitoring
+performance_logs/
+metrics/
+
+# Security logs
+security_logs/
+audit_logs/
+
+# Error logs
+error_logs/
+crash_logs/
+
+# Application logs
+app_logs/
+application_logs/
+
+# Access logs
+access_logs/
+
+# Debug files
+debug.log
+debug_*.log
+
+# Lock files (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Jest
+jest.config.js
+
+# Mocha
+.mocha/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Build artifacts
+*.tsbuildinfo
+
+# TypeScript cache
+*.tsbuildinfo
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettiercache
+
+# Husky
+.husky/_
+
+# Lint-staged
+.lintstagedrc*
+
+# PM2
+.pm2/
+ecosystem.config.js
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Kubernetes
+k8s/
+kubernetes/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# AWS
+.aws/
+
+# Google Cloud
+.gcloud/
+
+# Azure
+.azure/
+
+# Serverless
+.serverless/
+
+# Vercel
+.vercel/
+
+# Netlify
+.netlify/
+
+# Railway
+.railway/
+
+# Heroku
+.heroku/
+
+# Environment specific
+.env.production
+.env.staging
+.env.development
+
+# API keys and secrets
+secrets/
+keys/
+certificates/
+*.pem
+*.key
+*.crt
+*.p12
+
+# JWT secrets
+jwt_secret.txt
+
+# Database credentials
+db_credentials.txt
+
+# Third-party service configs
+service_configs/
+
+# Monitoring
+monitoring/
+grafana/
+prometheus/
+
+# Log aggregation
+logstash/
+elasticsearch/
+
+# Cache directories
+cache/
+.cache/
+redis_cache/
+
+# Temporary processing
+temp_processing/
+processing_queue/
+
+# File system watchers
+.watchmanconfig
+
+# Nodemon
+nodemon.json
+
+# PM2 ecosystem
+ecosystem.config.js
+
+# Cluster mode
+cluster/
+
+# Load balancer configs
+nginx/
+apache/
+
+# SSL certificates
+ssl/
+certificates/
+
+# Backup directories
+backups/
+db_backups/
+
+# Migration files (if you want to ignore them)
+migrations/
+seeds/
+
+# Documentation builds
+docs/build/
+docs/dist/
+
+# API documentation
+api_docs/
+swagger-ui/
+
+# Health check files
+health_check.txt
+status.txt
+
+# Maintenance mode
+maintenance/
+maintenance.txt
+
+# Rate limiting
+rate_limit_cache/
+
+# Session store
+session_store/
+redis_sessions/
+
+# Queue workers
+workers/
+job_queue/
+
+# Scheduled tasks
+cron/
+scheduled/
+
+# Webhooks
+webhooks/
+hook_logs/
+
+# Analytics
+analytics/
+tracking/
+
+# Metrics
+metrics/
+stats/
+
+# Performance
+performance/
+benchmarks/
+
+# Security
+security/
+audit/
+
+# Compliance
+compliance/
+gdpr/
+
+# Local development databases
+local_db/
+dev_database/
+
+# Test databases
+test_db/
+test_database/
+
+# Mock data
+mock_data/
+fixtures/
+
+# Sample files
+samples/
+examples/
+
+# Documentation
+docs/
+documentation/
+
+# API versioning
+api_versions/
+
+# Middleware
+middleware/
+middlewares/
+
+# Routes
+routes/
+controllers/
+
+# Models
+models/
+schemas/
+
+# Services
+services/
+utils/
+
+# Config
+config/
+configurations/
+
+# Constants
+constants/
+enums/
+
+# Types
+types/
+interfaces/
+
+# Interfaces
+interfaces/
+contracts/
+
+# Validators
+validators/
+validations/
+
+# Serializers
+serializers/
+transformers/
+
+# Helpers
+helpers/
+utilities/
+
+# Middleware
+middleware/
+middlewares/
+
+# Plugins
+plugins/
+extensions/
+
+# Modules
+modules/
+components/
+
+# Libraries
+lib/
+libraries/
+
+# Vendors
+vendor/
+vendors/
+
+# Third-party
+third_party/
+external/
+
+# Custom
+custom/
+extensions/
+
+# Patches
+patches/
+modifications/
+
+# Overrides
+overrides/
+customizations/
+
+# Local modifications
+local/
+modifications/
+
+# Development tools
+dev_tools/
+development/
+
+# Debugging
+debug/
+debugging/
+
+# Profiling
+profiling/
+profiles/
+
+# Benchmarking
+benchmarks/
+benchmarking/
+
+# Testing
+testing/
+tests/
+
+# Quality assurance
+qa/
+quality/
+
+# Staging
+staging/
+stage/
+
+# Production
+production/
+prod/
+
+# Development
+development/
+dev/
+
+# Local
+local/
+localhost/
+
+# Sandbox
+sandbox/
+sandboxing/
+
+# Experimental
+experimental/
+experiments/
+
+# Beta
+beta/
+beta_testing/
+
+# Alpha
+alpha/
+alpha_testing/
+
+# Release candidates
+rc/
+release_candidates/
+
+# Hotfixes
+hotfix/
+hotfixes/
+
+# Patches
+patch/
+patches/
+
+# Minor versions
+minor/
+minor_versions/
+
+# Major versions
+major/
+major_versions/
+
+# Version control
+version_control/
+versions/
+
+# Changelog
+changelog/
+CHANGELOG.md
+
+# Release notes
+release_notes/
+RELEASE_NOTES.md
+
+# Documentation
+documentation/
+docs/
+
+# README files
+README.md
+readme.md
+
+# License files
+LICENSE
+license.txt
+
+# Contributing
+CONTRIBUTING.md
+contributing.md
+
+# Code of conduct
+CODE_OF_CONDUCT.md
+code_of_conduct.md
+
+# Security policy
+SECURITY.md
+security.md
+
+# Support
+SUPPORT.md
+support.md
+
+# FAQ
+FAQ.md
+faq.md
+
+# Troubleshooting
+TROUBLESHOOTING.md
+troubleshooting.md
+
+# Installation
+INSTALLATION.md
+installation.md
+
+# Configuration
+CONFIGURATION.md
+configuration.md
+
+# Deployment
+DEPLOYMENT.md
+deployment.md
+
+# API documentation
+API.md
+api.md
+
+# Changelog
+CHANGELOG.md
+changelog.md
+
+# Release notes
+RELEASE_NOTES.md
+release_notes.md
+
+# Version history
+VERSION_HISTORY.md
+version_history.md
+
+# Migration guide
+MIGRATION.md
+migration.md
+
+# Upgrade guide
+UPGRADE.md
+upgrade.md
+
+# Downgrade guide
+DOWNGRADE.md
+downgrade.md
+
+# Rollback guide
+ROLLBACK.md
+rollback.md
+
+# Recovery guide
+RECOVERY.md
+recovery.md
+
+# Backup guide
+BACKUP.md
+backup.md
+
+# Restore guide
+RESTORE.md
+restore.md
+
+# Maintenance guide
+MAINTENANCE.md
+maintenance.md
+
+# Monitoring guide
+MONITORING.md
+monitoring.md
+
+# Logging guide
+LOGGING.md
+logging.md
+
+# Debugging guide
+DEBUGGING.md
+debugging.md
+
+# Performance guide
+PERFORMANCE.md
+performance.md
+
+# Security guide
+SECURITY.md
+security.md
+
+# Compliance guide
+COMPLIANCE.md
+compliance.md
+
+# Privacy guide
+PRIVACY.md
+privacy.md
+
+# Terms of service
+TERMS.md
+terms.md
+
+# Privacy policy
+PRIVACY_POLICY.md
+privacy_policy.md
+
+# Terms of use
+TERMS_OF_USE.md
+terms_of_use.md
+
+# User agreement
+USER_AGREEMENT.md
+user_agreement.md
+
+# Service agreement
+SERVICE_AGREEMENT.md
+service_agreement.md
+
+# License agreement
+LICENSE_AGREEMENT.md
+license_agreement.md
+
+# End user license agreement
+EULA.md
+eula.md
+
+# Software license agreement
+SLA.md
+sla.md
+
+# Master service agreement
+MSA.md
+msa.md
+
+# Statement of work
+SOW.md
+sow.md
+
+# Work order
+WO.md
+wo.md
+
+# Purchase order
+PO.md
+po.md
+
+# Invoice
+INVOICE.md
+invoice.md
+
+# Receipt
+RECEIPT.md
+receipt.md
+
+# Quote
+QUOTE.md
+quote.md
+
+# Proposal
+PROPOSAL.md
+proposal.md
+
+# Contract
+CONTRACT.md
+contract.md
+
+# Agreement
+AGREEMENT.md
+agreement.md
+
+# Memorandum of understanding
+MOU.md
+mou.md
+
+# Letter of intent
+LOI.md
+loi.md
+
+# Non-disclosure agreement
+NDA.md
+nda.md
+
+# Confidentiality agreement
+CA.md
+ca.md
+
+# Non-compete agreement
+NCA.md
+nca.md
+
+# Employment agreement
+EA.md
+ea.md
+
+# Consulting agreement
+CONSULTING.md
+consulting.md
+
+# Service level agreement
+SLA.md
+sla.md
+
+# Master service agreement
+MSA.md
+msa.md
+
+# Statement of work
+SOW.md
+sow.md
+
+# Work order
+WO.md
+wo.md
+
+# Purchase order
+PO.md
+po.md
+
+# Invoice
+INVOICE.md
+invoice.md
+
+# Receipt
+RECEIPT.md
+receipt.md
+
+# Quote
+QUOTE.md
+quote.md
+
+# Proposal
+PROPOSAL.md
+proposal.md
+
+# Contract
+CONTRACT.md
+contract.md
+
+# Agreement
+AGREEMENT.md
+agreement.md
+
+# Memorandum of understanding
+MOU.md
+mou.md
+
+# Letter of intent
+LOI.md
+loi.md
+
+# Non-disclosure agreement
+NDA.md
+nda.md
+
+# Confidentiality agreement
+CA.md
+ca.md
+
+# Non-compete agreement
+NCA.md
+nca.md
+
+# Employment agreement
+EA.md
+ea.md
+
+# Consulting agreement
+CONSULTING.md
+consulting.md

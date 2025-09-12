@@ -11,10 +11,11 @@ export default function ForgotPassword() {
     setMsg(''); setError('');
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/auth/forgot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+      const res = await fetch('http://localhost:5000/auth/forgot', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-App-Base-Url': window.location.origin }, body: JSON.stringify({ email }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed');
-      setMsg('If the email exists, a reset link has been sent. For dev: ' + (data.token || '')); 
+      const link = data.token ? `${window.location.origin}/reset?token=${encodeURIComponent(data.token)}` : '';
+      setMsg(`If the email exists, a reset link has been sent.${link ? ` For dev: ${link}` : ''}`); 
     } catch (err) {
       setError(err.message);
     } finally {
@@ -29,7 +30,7 @@ export default function ForgotPassword() {
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2 text-center">Forgot Password</h1>
           <p className="text-muted-foreground text-center mb-6">Enter your email to receive a reset link.</p>
           {error && <div className="error-container mb-4">{error}</div>}
-          {msg && <div className="error-container mb-4" style={{borderColor:'#22c55e', color:'#bbf7d0'}}>{msg}</div>}
+          {msg && <div className="error-container mb-4" style={{borderColor:'#22c55e', color:'#bbf7d0', wordBreak:'break-all', overflowWrap:'anywhere'}}>{msg}</div>}
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-muted-foreground mb-2">Email</label>

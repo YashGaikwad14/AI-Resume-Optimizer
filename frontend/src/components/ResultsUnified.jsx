@@ -1,5 +1,5 @@
 import { useRecoilValue, useRecoilState } from 'recoil';
-import { activeSectionState, resultsState, scoreState, coverLetterState, skillsGapState, rewriteBulletsState, tailorState, interviewQsState, linkedinState, showAnalysisState, showScoreState, showCoverState, showRewriteState, showSkillsState, showTailorState, showInterviewState, showLinkedinState } from '../Atoms/atoms';
+import { activeSectionState, resultsState, scoreState, coverLetterState, skillsGapState, rewriteBulletsState, tailorState, interviewQsState, linkedinState, atsOptimizerState, showAnalysisState, showScoreState, showCoverState, showRewriteState, showSkillsState, showTailorState, showInterviewState, showLinkedinState, showAtsOptimizerState } from '../Atoms/atoms';
 
 export default function ResultsUnified() {
   const active = useRecoilValue(activeSectionState);
@@ -11,6 +11,7 @@ export default function ResultsUnified() {
   const tailor = useRecoilValue(tailorState);
   const interviewQs = useRecoilValue(interviewQsState);
   const linkedin = useRecoilValue(linkedinState);
+  const atsOptimizer = useRecoilValue(atsOptimizerState);
 
   const [showAnalysis, setShowAnalysis] = useRecoilState(showAnalysisState);
   const [showScore, setShowScore] = useRecoilState(showScoreState);
@@ -20,6 +21,7 @@ export default function ResultsUnified() {
   const [showTailor, setShowTailor] = useRecoilState(showTailorState);
   const [showInterview, setShowInterview] = useRecoilState(showInterviewState);
   const [showLinkedin, setShowLinkedin] = useRecoilState(showLinkedinState);
+  const [showAtsOptimizer, setShowAtsOptimizer] = useRecoilState(showAtsOptimizerState);
 
   const copyHtmlText = async (html) => {
     if (!html) return;
@@ -33,8 +35,8 @@ export default function ResultsUnified() {
     <div className="space-y-6">
       {/* Analysis */}
       {results && (
-        <div className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'analysis' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'analysis' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Resume Improvements</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(results)}>Copy</button>
@@ -49,10 +51,10 @@ export default function ResultsUnified() {
 
       {/* Score */}
       {score && (
-        <div id="section-score" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'score' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div id="section-score" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'score' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Match Score: {score.score}%</h3>
-            <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowScore(v => !v)}>{showScore ? 'Hide' : 'Show'}</button>
+            <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50 self-start" onClick={() => setShowScore(v => !v)}>{showScore ? 'Hide' : 'Show'}</button>
           </div>
           {showScore && score.matched?.length ? (
             <div className="mt-2 flex flex-wrap gap-2">
@@ -73,8 +75,8 @@ export default function ResultsUnified() {
 
       {/* Cover Letter */}
       {coverLetter && (
-        <div id="section-coverLetter" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'coverLetter' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div id="section-coverLetter" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'coverLetter' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Cover Letter</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(coverLetter)}>Copy</button>
@@ -89,8 +91,8 @@ export default function ResultsUnified() {
 
       {/* Tools */}
       {rewriteBullets && (
-        <div id="section-rewrite" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'rewrite' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div id="section-rewrite" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'rewrite' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Rewritten Bullets</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(rewriteBullets)}>Copy</button>
@@ -104,9 +106,9 @@ export default function ResultsUnified() {
       )}
 
       {skillsGap && (
-        <div id="section-skills" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'skills' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3 ">
-            <h3 className="text-lg font-semibold text-foreground ">Skills Gap & Roadmap</h3>
+        <div id="section-skills" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'skills' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
+            <h3 className="text-lg font-semibold text-foreground">Skills Gap & Roadmap</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(skillsGap)}>Copy</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowSkills(v => !v)}>{showSkills ? 'Hide' : 'Show'}</button>
@@ -119,8 +121,8 @@ export default function ResultsUnified() {
       )}
 
       {tailor && (
-        <div id="section-tailor" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'tailor' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div id="section-tailor" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'tailor' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Tailored Mapping</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(tailor)}>Copy</button>
@@ -134,8 +136,8 @@ export default function ResultsUnified() {
       )}
 
       {interviewQs && (
-        <div id="section-interview" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'interview' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div id="section-interview" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'interview' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Interview Questions</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(interviewQs)}>Copy</button>
@@ -149,8 +151,8 @@ export default function ResultsUnified() {
       )}
 
       {linkedin && (
-        <div id="section-linkedin" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'linkedin' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
+        <div id="section-linkedin" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'linkedin' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">LinkedIn Suggestions</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(linkedin)}>Copy</button>
@@ -159,6 +161,21 @@ export default function ResultsUnified() {
           </div>
           {showLinkedin && (
             <div className="prose-custom break-words overflow-x-auto" dangerouslySetInnerHTML={{ __html: linkedin }} />
+          )}
+        </div>
+      )}
+
+      {atsOptimizer && (
+        <div id="section-premiumAts" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'premiumAts' ? 'ring-2 ring-primary/50' : ''}`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
+            <h3 className="text-lg font-semibold text-foreground">ATS Optimizer</h3>
+            <div className="flex items-center gap-2">
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(atsOptimizer)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowAtsOptimizer(v => !v)}>{showAtsOptimizer ? 'Hide' : 'Show'}</button>
+            </div>
+          </div>
+          {showAtsOptimizer && (
+            <div className="prose-custom break-words overflow-x-auto" dangerouslySetInnerHTML={{ __html: atsOptimizer }} />
           )}
         </div>
       )}

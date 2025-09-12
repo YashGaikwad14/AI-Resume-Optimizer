@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { supabase } = require('./supabase');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const SignUpSchema = z.object({
   email: z.string().email(),
@@ -27,7 +28,7 @@ async function createUser({ email, password, name }) {
   const password_hash = await bcrypt.hash(password, 10);
   const { data, error } = await supabase
     .from('users')
-    .insert({ email, password_hash, name })
+    .insert({ email, password_hash, name, is_premium: false })
     .select()
     .single();
   if (error) return { error: error.message };
@@ -83,6 +84,67 @@ module.exports.ResetSchema = ResetSchema;
 module.exports.createResetToken = createResetToken;
 module.exports.consumeResetToken = consumeResetToken;
 module.exports.updatePassword = updatePassword;
+
+// Simple SMTP mailer using env config
+function getMailer() {
+  const host = process.env.SMTP_HOST || '';
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER || '';
+  const pass = process.env.SMTP_PASS || '';
+  if (!host || !user || !pass) return null;
+  const secure = String(process.env.SMTP_SECURE || '').toLowerCase() === 'true';
+  return nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
+}
+
+async function sendResetEmail({ to, token, appBaseUrl }) {
+  try {
+    const transporter = getMailer();
+    if (!transporter) return { skipped: true };
+    const base = appBaseUrl || process.env.APP_BASE_URL || 'http://localhost:5173';
+    const resetUrl = `${base}/reset?token=${encodeURIComponent(token)}`;
+    const info = await transporter.sendMail({
+      from: process.env.MAIL_FROM || 'no-reply@example.com',
+      to,
+      subject: 'Password reset',
+      text: `Click the link to reset your password: ${resetUrl}`,
+      html: `<p>Click the link to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+    });
+    return { messageId: info.messageId };
+  } catch (err) {
+    return { error: err.message };
+  }
+}
+
+module.exports.sendResetEmail = sendResetEmail;
+
+// JWT helpers and user fetches
+function verifyToken(token) {
+  try {
+    const secret = process.env.JWT_SECRET || 'dev-secret-change-me';
+    const claim = jwt.verify(token, secret);
+    return { claim };
+  } catch (err) {
+    return { error: 'Invalid token' };
+  }
+}
+
+async function getUserById(id) {
+  if (!supabase) return { error: 'supabase not configured' };
+  const { data, error } = await supabase
+    .from('users')
+    .select('id,email,name,is_premium')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) return { error: error.message };
+  if (!data) return { error: 'User not found' };
+  if (typeof data.is_premium === 'undefined' || data.is_premium === null) {
+    data.is_premium = false;
+  }
+  return { data };
+}
+
+module.exports.verifyToken = verifyToken;
+module.exports.getUserById = getUserById;
 
 
 
