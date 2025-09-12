@@ -105,8 +105,8 @@ export default function ResultsUnified() {
 
       {skillsGap && (
         <div id="section-skills" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 ${active === 'skills' ? 'ring-2 ring-primary/50' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xl md:text-2xl font-semibold text-foreground ">Skills Gap & Roadmap</h3>
+          <div className="flex items-center justify-between mb-3 ">
+            <h3 className="text-lg font-semibold text-foreground ">Skills Gap & Roadmap</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(skillsGap)}>Copy</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowSkills(v => !v)}>{showSkills ? 'Hide' : 'Show'}</button>

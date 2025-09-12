@@ -12,8 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 require("dotenv").config(); 
+const { saveEvent, saveRecord, recentRecords, searchRecords } = require("./models/supabase");
 
 const { GEMINI_API_KEY, GEMINI_URL } = require("./models/gemini");
+const authRouter = require('./routes/auth');
+// Auth endpoints
+app.use('/auth', authRouter);
 
 app.post("/analyze", upload.single("resume"), async (req, res) => {
   try {
@@ -25,11 +29,14 @@ app.post("/analyze", upload.single("resume"), async (req, res) => {
 
     const systemPrompt = `You are a world-class career coach and professional resume writer. 
 Provide concise, actionable feedback on a resume, optionally tailored to a specific job description.
-Format strictly in Markdown:
+Format strictly in Markdown in field of related jobs suggest jobs he can apply to.:
+
 ### Resume Improvements
 - suggestions
 ### Skills to Learn
-- skills`;
+- skills
+### Related Job Titles
+- titles`;
 
     let userQuery = `**Resume Text:**\n${resumeText}`;
     if (jobDescription.trim()) {
@@ -60,6 +67,8 @@ Format strictly in Markdown:
       result?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "No response from AI";
 
+    // Persist minimal record
+    saveRecord({ type: 'analyze', content: output, created_at: new Date().toISOString() });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -87,6 +96,7 @@ app.post("/score", upload.single("resume"), async (req, res) => {
     if (!/email|@/.test(resumeText)) flags.push("Missing email contact");
     if (!/skills/.test(resumeText)) flags.push("Missing skills section");
 
+    saveRecord({ type: 'score', content: JSON.stringify({ score, matched, totalKeywords: words.length, flags }), created_at: new Date().toISOString() });
     res.json({ score, matched, totalKeywords: words.length, flags });
   } catch (err) {
     console.error(err);
@@ -127,6 +137,7 @@ app.post("/cover-letter", upload.single("resume"), async (req, res) => {
       result?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "No response from AI";
 
+    saveRecord({ type: 'cover_letter', content: output, created_at: new Date().toISOString() });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -150,6 +161,7 @@ app.post("/rewrite-bullets", upload.single("resume"), async (req, res) => {
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    saveRecord({ type: 'rewrite_bullets', content: output, created_at: new Date().toISOString() });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -172,6 +184,7 @@ app.post("/skills-gap", upload.single("resume"), async (req, res) => {
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    saveRecord({ type: 'skills_gap', content: output, created_at: new Date().toISOString() });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -194,6 +207,7 @@ app.post("/tailor", upload.single("resume"), async (req, res) => {
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    saveRecord({ type: 'tailor', content: output, created_at: new Date().toISOString() });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -216,6 +230,7 @@ app.post("/interview-questions", upload.single("resume"), async (req, res) => {
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    saveRecord({ type: 'interview_questions', content: output, created_at: new Date().toISOString() });
     res.json({ result: output });
   } catch (err) {
     console.error(err);
@@ -238,6 +253,22 @@ app.post("/linkedin", upload.single("resume"), async (req, res) => {
     if (!response.ok) return res.status(500).json({ error: "Gemini API request failed" });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    saveRecord({ type: 'linkedin', content: output, created_at: new Date().toISOString() });
+
+// Search & recent endpoints
+app.get('/records/recent', async (req, res) => {
+  const { type, limit } = req.query;
+  const { data, error } = await recentRecords(type, Number(limit) || 20);
+  if (error) return res.status(500).json({ error });
+  res.json({ data });
+});
+
+app.get('/records/search', async (req, res) => {
+  const { q, type, limit } = req.query;
+  const { data, error } = await searchRecords(q || '', type, Number(limit) || 50);
+  if (error) return res.status(500).json({ error });
+  res.json({ data });
+});
     res.json({ result: output });
   } catch (err) {
     console.error(err);
