@@ -1,12 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { activeSectionState } from '../Atoms/atoms';
+import { marked } from 'marked';
+import { 
+  activeSectionState, 
+  resultsState, 
+  scoreState, 
+  coverLetterState, 
+  rewriteBulletsState, 
+  skillsGapState, 
+  tailorState, 
+  interviewQsState, 
+  linkedinState, 
+  atsOptimizerState 
+} from '../Atoms/atoms';
 
 export default function HistorySidebar({ isOpen, onClose }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeSection, setActiveSection] = useRecoilState(activeSectionState);
+  const [, setResults] = useRecoilState(resultsState);
+  const [, setScore] = useRecoilState(scoreState);
+  const [, setCoverLetter] = useRecoilState(coverLetterState);
+  const [, setRewriteBullets] = useRecoilState(rewriteBulletsState);
+  const [, setSkillsGap] = useRecoilState(skillsGapState);
+  const [, setTailor] = useRecoilState(tailorState);
+  const [, setInterviewQs] = useRecoilState(interviewQsState);
+  const [, setLinkedin] = useRecoilState(linkedinState);
+  const [, setAtsOptimizer] = useRecoilState(atsOptimizerState);
   const [selectedItem, setSelectedItem] = useState(null);
 
   function handleClick(item) {
@@ -68,7 +89,7 @@ export default function HistorySidebar({ isOpen, onClose }) {
   };
 
   const handleHistoryClick = (record) => {
-    // Map record types to section names
+    // Map record types to section names and state setters
     const typeToSection = {
       'analyze': 'analysis',
       'score': 'score',
@@ -77,11 +98,50 @@ export default function HistorySidebar({ isOpen, onClose }) {
       'skills_gap': 'skillsGap',
       'tailor': 'tailor',
       'interview_questions': 'interviewQs',
-      'linkedin': 'linkedin'
+      'linkedin': 'linkedin',
+      'premium_ats_optimizer': 'premiumAts'
     };
     
     const section = typeToSection[record.type];
     if (section) {
+      // Load the historical content into the appropriate state
+      switch (record.type) {
+        case 'analyze':
+          setResults(marked(record.content));
+          break;
+        case 'score':
+          try {
+            const scoreData = JSON.parse(record.content);
+            setScore(scoreData);
+          } catch (e) {
+            console.error('Failed to parse score data:', e);
+          }
+          break;
+        case 'cover_letter':
+          setCoverLetter(marked(record.content));
+          break;
+        case 'rewrite_bullets':
+          setRewriteBullets(marked(record.content));
+          break;
+        case 'skills_gap':
+          setSkillsGap(marked(record.content));
+          break;
+        case 'tailor':
+          setTailor(marked(record.content));
+          break;
+        case 'interview_questions':
+          setInterviewQs(marked(record.content));
+          break;
+        case 'linkedin':
+          setLinkedin(marked(record.content));
+          break;
+        case 'premium_ats_optimizer':
+          setAtsOptimizer(marked(record.content));
+          break;
+        default:
+          console.warn('Unknown record type:', record.type);
+      }
+      
       setActiveSection(section);
       // Scroll to the section
       setTimeout(() => {

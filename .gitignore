@@ -334,3 +334,13 @@ model_cache/
 
 # Premium user data exports
 user_exports/
+
+# PDF generation cache
+pdf_cache/
+generated_pdfs/
+temp_pdfs/
+
+# Payment processing (if storing locally)
+payment_logs/
+stripe_logs/
+transaction_logs/

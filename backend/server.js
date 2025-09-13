@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
@@ -65,7 +63,8 @@ app.post('/premium/ats-optimizer', requirePremium, upload.single('resume'), asyn
     if (!response.ok) return res.status(500).json({ error: 'Gemini API request failed' });
     const result = await response.json();
     const output = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
-    saveRecord({ type: 'premium_ats_optimizer', content: output, created_at: new Date().toISOString() });
+    const userId = getUserIdFromRequest(req);
+    saveRecord({ type: 'premium_ats_optimizer', content: output, created_at: new Date().toISOString(), user_id: userId });
     res.json({ result: output });
   } catch (err) {
     console.error(err);

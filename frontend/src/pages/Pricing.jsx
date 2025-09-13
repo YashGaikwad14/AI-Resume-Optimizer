@@ -6,7 +6,7 @@ export default function Pricing() {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [upgradeMessage, setUpgradeMessage] = useState("");
 
-  const onUpgrade = async () => {
+  const onUpgrade = async (paymentMethod = 'demo') => {
     try {
       if (!token) { 
         window.location.href = '/signin'; 
@@ -23,7 +23,8 @@ export default function Pricing() {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        } 
+        },
+        body: JSON.stringify({ paymentMethod })
       });
       
       console.log('Upgrade response status:', res.status);
@@ -34,6 +35,12 @@ export default function Pricing() {
         setUpgradeMessage("Success! Upgrading to premium...");
         setTimeout(() => {
           window.location.reload();
+        }, 1000);
+      } else if (data?.requiresPayment) {
+        setUpgradeMessage("Payment required. Please complete payment to upgrade to premium.");
+        // In a real app, redirect to payment processor
+        setTimeout(() => {
+          alert('In production, this would redirect to Stripe/PayPal payment page');
         }, 1000);
       } else {
         setUpgradeMessage(`Error: ${data?.error || 'Upgrade failed'}`);
@@ -64,6 +71,7 @@ export default function Pricing() {
             </div>
             <div className="p-4 sm:p-6 rounded-xl border border-primary/40 bg-gradient-to-br from-amber-500/10 to-rose-500/10">
               <h3 className="font-semibold mb-2">Premium</h3>
+              <div className="text-2xl font-bold text-primary mb-2">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></div>
               <ul className="text-sm text-foreground space-y-1">
                 <li>Everything in Free</li>
                 <li>Rewrite Bullets</li>
@@ -73,13 +81,24 @@ export default function Pricing() {
                 <li>LinkedIn Suggestions</li>
                 <li>ATS Optimizer</li>
               </ul>
-              <button 
-                className="mt-4 btn-primary w-full sm:w-auto text-sm sm:text-base" 
-                onClick={onUpgrade}
-                disabled={isUpgrading}
-              >
-                {isUpgrading ? "Upgrading..." : "Unlock Premium"}
-              </button>
+              <div className="mt-4 space-y-2">
+                <button 
+                  className="btn-primary w-full text-sm sm:text-base" 
+                  onClick={() => onUpgrade('stripe')}
+                  disabled={isUpgrading}
+                >
+                  {isUpgrading ? "Processing..." : "Upgrade with Stripe - $9.99/month"}
+                </button>
+                {process.env.NODE_ENV === 'development' && (
+                  <button 
+                    className="w-full px-4 py-2 text-sm border border-amber-500 text-amber-600 rounded-lg hover:bg-amber-50 transition-colors" 
+                    onClick={() => onUpgrade('demo')}
+                    disabled={isUpgrading}
+                  >
+                    {isUpgrading ? "Processing..." : "Demo Upgrade (Dev Only)"}
+                  </button>
+                )}
+              </div>
               {upgradeMessage && (
                 <div className={`mt-2 text-sm ${upgradeMessage.includes('Success') ? 'text-green-600' : 'text-red-600'}`}>
                   {upgradeMessage}
@@ -92,5 +111,3 @@ export default function Pricing() {
     </div>
   );
 }
-
-

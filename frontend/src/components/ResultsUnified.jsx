@@ -1,5 +1,6 @@
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { activeSectionState, resultsState, scoreState, coverLetterState, skillsGapState, rewriteBulletsState, tailorState, interviewQsState, linkedinState, atsOptimizerState, showAnalysisState, showScoreState, showCoverState, showRewriteState, showSkillsState, showTailorState, showInterviewState, showLinkedinState, showAtsOptimizerState } from '../Atoms/atoms';
+import { downloadAsPDF } from '../utils/pdfGenerator';
 
 export default function ResultsUnified() {
   const active = useRecoilValue(activeSectionState);
@@ -31,15 +32,52 @@ export default function ResultsUnified() {
     await navigator.clipboard.writeText(text);
   };
 
+  const downloadScoreAsPDF = async (scoreData) => {
+    if (!scoreData) return;
+    
+    // Create HTML content for the score report
+    const scoreHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1 style="color: #333; margin-bottom: 20px;">Resume Match Score Report</h1>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <h2 style="color: #2563eb; margin: 0;">Overall Match Score: ${scoreData.score}%</h2>
+        </div>
+        
+        ${scoreData.matched?.length ? `
+          <h3 style="color: #333; margin-bottom: 10px;">Matched Keywords (${scoreData.matched.length}):</h3>
+          <div style="margin-bottom: 20px;">
+            ${scoreData.matched.map(word => `<span style="background: #dbeafe; color: #1d4ed8; padding: 4px 8px; margin: 2px; border-radius: 4px; display: inline-block;">${word}</span>`).join('')}
+          </div>
+        ` : ''}
+        
+        ${scoreData.flags?.length ? `
+          <h3 style="color: #333; margin-bottom: 10px;">Recommendations:</h3>
+          <ul style="margin: 0; padding-left: 20px;">
+            ${scoreData.flags.map(flag => `<li style="margin: 5px 0; color: #666;">${flag}</li>`).join('')}
+          </ul>
+        ` : ''}
+        
+        ${scoreData.totalKeywords ? `
+          <div style="margin-top: 20px; padding: 10px; background: #f9fafb; border-radius: 4px;">
+            <small style="color: #6b7280;">Total keywords analyzed: ${scoreData.totalKeywords}</small>
+          </div>
+        ` : ''}
+      </div>
+    `;
+    
+    await downloadAsPDF(scoreHtml, 'Resume Match Score');
+  };
+
   return (
     <div className="space-y-6">
       {/* Analysis */}
       {results && (
-        <div className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'analysis' ? 'ring-2 ring-primary/50' : ''}`}>
+        <div id="section-analysis" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'analysis' ? 'ring-2 ring-primary/50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Resume Improvements</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(results)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(results, 'Resume Analysis')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowAnalysis(v => !v)}>{showAnalysis ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -54,7 +92,10 @@ export default function ResultsUnified() {
         <div id="section-score" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'score' ? 'ring-2 ring-primary/50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Match Score: {score.score}%</h3>
-            <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50 self-start" onClick={() => setShowScore(v => !v)}>{showScore ? 'Hide' : 'Show'}</button>
+            <div className="flex items-center gap-2">
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadScoreAsPDF(score)}>Download PDF</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowScore(v => !v)}>{showScore ? 'Hide' : 'Show'}</button>
+            </div>
           </div>
           {showScore && score.matched?.length ? (
             <div className="mt-2 flex flex-wrap gap-2">
@@ -80,6 +121,7 @@ export default function ResultsUnified() {
             <h3 className="text-lg font-semibold text-foreground">Cover Letter</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(coverLetter)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(coverLetter, 'Cover Letter')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowCover(v => !v)}>{showCover ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -91,11 +133,12 @@ export default function ResultsUnified() {
 
       {/* Tools */}
       {rewriteBullets && (
-        <div id="section-rewrite" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'rewrite' ? 'ring-2 ring-primary/50' : ''}`}>
+        <div id="section-rewriteBullets" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'rewriteBullets' ? 'ring-2 ring-primary/50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Rewritten Bullets</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(rewriteBullets)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(rewriteBullets, 'Rewritten Bullets')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowRewrite(v => !v)}>{showRewrite ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -106,11 +149,12 @@ export default function ResultsUnified() {
       )}
 
       {skillsGap && (
-        <div id="section-skills" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'skills' ? 'ring-2 ring-primary/50' : ''}`}>
+        <div id="section-skillsGap" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'skillsGap' ? 'ring-2 ring-primary/50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Skills Gap & Roadmap</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(skillsGap)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(skillsGap, 'Skills Gap Analysis')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowSkills(v => !v)}>{showSkills ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -126,6 +170,7 @@ export default function ResultsUnified() {
             <h3 className="text-lg font-semibold text-foreground">Tailored Mapping</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(tailor)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(tailor, 'Tailored Resume Mapping')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowTailor(v => !v)}>{showTailor ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -136,11 +181,12 @@ export default function ResultsUnified() {
       )}
 
       {interviewQs && (
-        <div id="section-interview" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'interview' ? 'ring-2 ring-primary/50' : ''}`}>
+        <div id="section-interviewQs" className={`rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-4 sm:p-6 ${active === 'interviewQs' ? 'ring-2 ring-primary/50' : ''}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
             <h3 className="text-lg font-semibold text-foreground">Interview Questions</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(interviewQs)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(interviewQs, 'Interview Questions')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowInterview(v => !v)}>{showInterview ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -156,6 +202,7 @@ export default function ResultsUnified() {
             <h3 className="text-lg font-semibold text-foreground">LinkedIn Suggestions</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(linkedin)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(linkedin, 'LinkedIn Suggestions')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowLinkedin(v => !v)}>{showLinkedin ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -171,6 +218,7 @@ export default function ResultsUnified() {
             <h3 className="text-lg font-semibold text-foreground">ATS Optimizer</h3>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => copyHtmlText(atsOptimizer)}>Copy</button>
+              <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => downloadAsPDF(atsOptimizer, 'ATS Optimizer Report')}>Download PDF</button>
               <button className="px-3 py-1 text-sm rounded-lg border border-border bg-background/50" onClick={() => setShowAtsOptimizer(v => !v)}>{showAtsOptimizer ? 'Hide' : 'Show'}</button>
             </div>
           </div>
@@ -182,7 +230,3 @@ export default function ResultsUnified() {
     </div>
   );
 }
-
-
-
-

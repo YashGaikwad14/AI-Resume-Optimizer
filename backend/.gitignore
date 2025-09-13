@@ -109,32 +109,6 @@ Icon?
 .Trash-*
 .nfs*
 
-# Local development
-.local/
-.localhost/
-
-# Deployment platforms
-.vercel/
-.netlify/
-.railway/
-.heroku/
-
-# Backup files
-*.bak
-*.backup
-*.old
-
-# Archive files
-*.zip
-*.rar
-*.7z
-*.tar
-*.gz
-
-# Configuration backups
-config.backup.*
-settings.backup.*
-
 # AI Resume Optimizer Backend specific
 # User uploads
 uploads/
@@ -180,10 +154,6 @@ temp_processing/
 email_templates/
 mail_templates/
 
-# API documentation
-api_docs/
-swagger/
-
 # Test files
 test_files/
 test_uploads/
@@ -220,12 +190,6 @@ pnpm-lock.yaml
 coverage/
 .nyc_output/
 
-# Jest
-jest.config.js
-
-# Mocha
-.mocha/
-
 # Temporary files
 *.tmp
 *.temp
@@ -243,59 +207,6 @@ jest.config.js
 
 # Prettier
 .prettiercache
-
-# Husky
-.husky/_
-
-# Lint-staged
-.lintstagedrc*
-
-# PM2
-.pm2/
-ecosystem.config.js
-
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Kubernetes
-k8s/
-kubernetes/
-
-# Terraform
-*.tfstate
-*.tfstate.*
-.terraform/
-
-# AWS
-.aws/
-
-# Google Cloud
-.gcloud/
-
-# Azure
-.azure/
-
-# Serverless
-.serverless/
-
-# Vercel
-.vercel/
-
-# Netlify
-.netlify/
-
-# Railway
-.railway/
-
-# Heroku
-.heroku/
-
-# Environment specific
-.env.production
-.env.staging
-.env.development
 
 # API keys and secrets
 secrets/
@@ -315,15 +226,6 @@ db_credentials.txt
 # Third-party service configs
 service_configs/
 
-# Monitoring
-monitoring/
-grafana/
-prometheus/
-
-# Log aggregation
-logstash/
-elasticsearch/
-
 # Cache directories
 cache/
 .cache/
@@ -333,25 +235,20 @@ redis_cache/
 temp_processing/
 processing_queue/
 
-# File system watchers
-.watchmanconfig
-
-# Nodemon
-nodemon.json
-
-# PM2 ecosystem
+# PM2
+.pm2/
 ecosystem.config.js
 
-# Cluster mode
-cluster/
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
 
-# Load balancer configs
-nginx/
-apache/
-
-# SSL certificates
-ssl/
-certificates/
+# Deployment platforms
+.vercel/
+.netlify/
+.railway/
+.heroku/
 
 # Backup directories
 backups/
@@ -432,477 +329,12 @@ fixtures/
 samples/
 examples/
 
-# Documentation
-docs/
-documentation/
-
-# API versioning
-api_versions/
-
-# Middleware
-middleware/
-middlewares/
-
-# Routes
-routes/
-controllers/
-
-# Models
-models/
-schemas/
-
-# Services
-services/
-utils/
-
-# Config
-config/
-configurations/
-
-# Constants
-constants/
-enums/
-
-# Types
-types/
-interfaces/
-
-# Interfaces
-interfaces/
-contracts/
-
-# Validators
-validators/
-validations/
-
-# Serializers
-serializers/
-transformers/
-
-# Helpers
-helpers/
-utilities/
-
-# Middleware
-middleware/
-middlewares/
-
-# Plugins
-plugins/
-extensions/
-
-# Modules
-modules/
-components/
-
-# Libraries
-lib/
-libraries/
-
-# Vendors
-vendor/
-vendors/
-
-# Third-party
-third_party/
-external/
-
-# Custom
-custom/
-extensions/
-
-# Patches
-patches/
-modifications/
-
-# Overrides
-overrides/
-customizations/
-
-# Local modifications
-local/
-modifications/
-
-# Development tools
-dev_tools/
-development/
-
-# Debugging
-debug/
-debugging/
-
-# Profiling
-profiling/
-profiles/
-
-# Benchmarking
-benchmarks/
-benchmarking/
-
-# Testing
-testing/
-tests/
-
-# Quality assurance
-qa/
-quality/
-
-# Staging
-staging/
-stage/
-
-# Production
-production/
-prod/
-
-# Development
-development/
-dev/
-
-# Local
-local/
-localhost/
-
-# Sandbox
-sandbox/
-sandboxing/
-
-# Experimental
-experimental/
-experiments/
-
-# Beta
-beta/
-beta_testing/
-
-# Alpha
-alpha/
-alpha_testing/
-
-# Release candidates
-rc/
-release_candidates/
-
-# Hotfixes
-hotfix/
-hotfixes/
-
-# Patches
-patch/
-patches/
-
-# Minor versions
-minor/
-minor_versions/
-
-# Major versions
-major/
-major_versions/
-
-# Version control
-version_control/
-versions/
-
-# Changelog
-changelog/
-CHANGELOG.md
-
-# Release notes
-release_notes/
-RELEASE_NOTES.md
-
-# Documentation
-documentation/
-docs/
-
-# README files
-README.md
-readme.md
-
-# License files
-LICENSE
-license.txt
-
-# Contributing
-CONTRIBUTING.md
-contributing.md
-
-# Code of conduct
-CODE_OF_CONDUCT.md
-code_of_conduct.md
-
-# Security policy
-SECURITY.md
-security.md
-
-# Support
-SUPPORT.md
-support.md
-
-# FAQ
-FAQ.md
-faq.md
-
-# Troubleshooting
-TROUBLESHOOTING.md
-troubleshooting.md
-
-# Installation
-INSTALLATION.md
-installation.md
-
-# Configuration
-CONFIGURATION.md
-configuration.md
-
-# Deployment
-DEPLOYMENT.md
-deployment.md
-
-# API documentation
-API.md
-api.md
-
-# Changelog
-CHANGELOG.md
-changelog.md
-
-# Release notes
-RELEASE_NOTES.md
-release_notes.md
-
-# Version history
-VERSION_HISTORY.md
-version_history.md
-
-# Migration guide
-MIGRATION.md
-migration.md
-
-# Upgrade guide
-UPGRADE.md
-upgrade.md
-
-# Downgrade guide
-DOWNGRADE.md
-downgrade.md
-
-# Rollback guide
-ROLLBACK.md
-rollback.md
-
-# Recovery guide
-RECOVERY.md
-recovery.md
-
-# Backup guide
-BACKUP.md
-backup.md
-
-# Restore guide
-RESTORE.md
-restore.md
-
-# Maintenance guide
-MAINTENANCE.md
-maintenance.md
-
-# Monitoring guide
-MONITORING.md
-monitoring.md
-
-# Logging guide
-LOGGING.md
-logging.md
-
-# Debugging guide
-DEBUGGING.md
-debugging.md
-
-# Performance guide
-PERFORMANCE.md
-performance.md
-
-# Security guide
-SECURITY.md
-security.md
-
-# Compliance guide
-COMPLIANCE.md
-compliance.md
-
-# Privacy guide
-PRIVACY.md
-privacy.md
-
-# Terms of service
-TERMS.md
-terms.md
-
-# Privacy policy
-PRIVACY_POLICY.md
-privacy_policy.md
-
-# Terms of use
-TERMS_OF_USE.md
-terms_of_use.md
-
-# User agreement
-USER_AGREEMENT.md
-user_agreement.md
-
-# Service agreement
-SERVICE_AGREEMENT.md
-service_agreement.md
-
-# License agreement
-LICENSE_AGREEMENT.md
-license_agreement.md
-
-# End user license agreement
-EULA.md
-eula.md
-
-# Software license agreement
-SLA.md
-sla.md
-
-# Master service agreement
-MSA.md
-msa.md
-
-# Statement of work
-SOW.md
-sow.md
-
-# Work order
-WO.md
-wo.md
-
-# Purchase order
-PO.md
-po.md
-
-# Invoice
-INVOICE.md
-invoice.md
-
-# Receipt
-RECEIPT.md
-receipt.md
-
-# Quote
-QUOTE.md
-quote.md
-
-# Proposal
-PROPOSAL.md
-proposal.md
-
-# Contract
-CONTRACT.md
-contract.md
-
-# Agreement
-AGREEMENT.md
-agreement.md
-
-# Memorandum of understanding
-MOU.md
-mou.md
-
-# Letter of intent
-LOI.md
-loi.md
-
-# Non-disclosure agreement
-NDA.md
-nda.md
-
-# Confidentiality agreement
-CA.md
-ca.md
-
-# Non-compete agreement
-NCA.md
-nca.md
-
-# Employment agreement
-EA.md
-ea.md
-
-# Consulting agreement
-CONSULTING.md
-consulting.md
-
-# Service level agreement
-SLA.md
-sla.md
-
-# Master service agreement
-MSA.md
-msa.md
-
-# Statement of work
-SOW.md
-sow.md
-
-# Work order
-WO.md
-wo.md
-
-# Purchase order
-PO.md
-po.md
-
-# Invoice
-INVOICE.md
-invoice.md
-
-# Receipt
-RECEIPT.md
-receipt.md
-
-# Quote
-QUOTE.md
-quote.md
-
-# Proposal
-PROPOSAL.md
-proposal.md
-
-# Contract
-CONTRACT.md
-contract.md
-
-# Agreement
-AGREEMENT.md
-agreement.md
-
-# Memorandum of understanding
-MOU.md
-mou.md
-
-# Letter of intent
-LOI.md
-loi.md
-
-# Non-disclosure agreement
-NDA.md
-nda.md
-
-# Confidentiality agreement
-CA.md
-ca.md
-
-# Non-compete agreement
-NCA.md
-nca.md
-
-# Employment agreement
-EA.md
-ea.md
-
-# Consulting agreement
-CONSULTING.md
-consulting.md
+# Payment processing logs
+payment_logs/
+stripe_logs/
+transaction_logs/
+
+# PDF generation cache
+pdf_cache/
+generated_pdfs/
+temp_pdfs/

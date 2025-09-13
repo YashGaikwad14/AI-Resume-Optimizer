@@ -96,24 +96,52 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// Fake upgrade endpoint to toggle premium (for demo/testing)
+// Premium upgrade endpoint - requires payment verification
 router.post('/upgrade', async (req, res) => {
   try {
     const authHeader = req.headers.authorization || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
     if (!token) return res.status(401).json({ error: 'Missing token' });
+    
     const v = verifyToken(token);
     if (v.error) return res.status(401).json({ error: v.error });
-    if (!require('../models/supabase').supabase) return res.status(500).json({ error: 'supabase not configured' });
-    const { supabase } = require('../models/supabase');
-    const { error } = await supabase.from('users').update({ is_premium: true }).eq('id', v.claim.user_id);
-    if (error) return res.status(500).json({ error: error.message });
-    res.json({ ok: true });
+    
+    // Check if user is already premium
+    const user = await getUserById(v.claim.user_id);
+    if (user.error) return res.status(500).json({ error: user.error });
+    if (user.data.is_premium) {
+      return res.status(400).json({ error: 'User is already premium' });
+    }
+    
+    // For now, we'll implement a simple demo mode with restrictions
+    // In production, this should integrate with a payment processor like Stripe
+    const { paymentToken, paymentMethod } = req.body;
+    
+    if (!paymentToken && !paymentMethod) {
+      return res.status(400).json({ 
+        error: 'Payment verification required. Please provide payment details.',
+        requiresPayment: true 
+      });
+    }
+    
+    // TODO: Integrate with actual payment processor (Stripe, PayPal, etc.)
+    // For demo purposes, we'll add some basic validation
+    if (paymentMethod === 'demo' && process.env.NODE_ENV === 'development') {
+      // Only allow demo upgrades in development mode
+      if (!require('../models/supabase').supabase) return res.status(500).json({ error: 'supabase not configured' });
+      const { supabase } = require('../models/supabase');
+      const { error } = await supabase.from('users').update({ is_premium: true }).eq('id', v.claim.user_id);
+      if (error) return res.status(500).json({ error: error.message });
+      res.json({ ok: true, message: 'Demo upgrade successful' });
+    } else {
+      // In production, verify payment with payment processor
+      res.status(402).json({ 
+        error: 'Payment required. Please complete payment to upgrade to premium.',
+        requiresPayment: true,
+        paymentUrl: '/payment' // Redirect to payment page
+      });
+    }
   } catch (err) {
     res.status(500).json({ error: 'Failed to upgrade' });
   }
 });
-
-
-
-
