@@ -23,7 +23,7 @@ export default function About() {
               to="/signin" 
               className="px-8 py-3 rounded-xl text-lg font-semibold border border-border bg-background/50 hover:bg-background text-foreground transition-all duration-300"
             >
-              Sign In
+              SignIn
             </Link>
           </div>
         </section>
