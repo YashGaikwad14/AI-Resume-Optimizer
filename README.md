@@ -67,6 +67,7 @@ A comprehensive, AI-powered resume optimization platform that analyzes your PDF 
 - **Password hashing** with bcrypt
 - **Row Level Security** for data protection
 
+
 ## 📁 Project Structure
 
 ```
