@@ -10,7 +10,7 @@ import SignUp from './pages/SignUp.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import './index.css'
-import './app.css'
+import './App.css'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 function RootLayout() {
